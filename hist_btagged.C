@@ -33,7 +33,8 @@ void hist_btagged(){
   int nbins = 1000;
   double w = 1;
   
-  auto h_jet_pt_btag = new TH1I("jet_btagged","Jet p_{T} b-tagged;X-Axis",nbins,0.0,2.4e6);
+  auto h_jet_pt_btag = new TH1I("jet_btagged","Jet p_{T} b-tagged;X",nbins,0.0,5);
+  auto h_jet_pt = new TH1F("jet_pt","Jet_P_{T}; X; Counts",nbins,0.0,2.4e6);
   auto file = TFile::Open("bbww_x1000_s170.root");
 
   TTree* ctree = (TTree*)file->Get("CollectionTree");
@@ -54,16 +55,51 @@ void hist_btagged(){
   
   TFile f("btagged_pt.root","recreate");
 
+  for (int i=0; i<nentries;i++){
+    ctree->GetEntry(i);
+    for(uint j = 0; j< n_jet; j++){
+      h_jet_pt->Fill( jet_pt[j],w ); 
+    }
+  }
 
-  nbtags = 0; 
-  Int_t bj[] = {};
-  for (int j=0; j<nentries;j++){
-    ctree->GetEntry(j);
-    if(jet_btagged[j]>0){
-      nbtags++;
-      bj[nbtags]=j;
-      std::cout<<"passed..."<<std::endl;
-      h_jet_pt_btag->Fill(jet_pt[bj[nbtags]],w);
+  int64_t bj[] = {};	
+  
+  std::cout << "total number of entries: " << nentries << std::endl;
+  
+  for (int i=0; i<nentries;i++){
+    ctree->GetEntry(i);
+    int nbtags = 0; 
+    for (int j=0; j<n_jet; j++) {
+      if(jet_btagged[j]>0){         
+	bj[nbtags]=j;
+        nbtags++;
+
+	if (nbtags == 1) {
+	  //std::cout << "ptbj_" << nbtags << std::endl; 
+	  int pt_bj1 = jet_pt[bj[0]];
+	  //int pt_bj2 = jet_pt[bj[1]];
+	  //std::cout <<"1"<< "\t" << pt_bj1 <<std::endl;
+	}
+	else if (nbtags == 2) {
+	  int pt_bj2 = jet_pt[bj[1]];
+	  //std::cout <<"2"<< "\t" << pt_bj2 <<std::endl;
+	}
+	else if (nbtags == 3) {
+	  int pt_bj3 = jet_pt[bj[2]];
+	  //std::cout << "3"<< "\t" <<pt_bj3 <<std::endl;
+	}
+	else if (nbtags == 4) {
+	  int pt_bj4 = jet_pt[bj[3]];
+	  //std::cout << "4"<< "\t" << pt_bj4 <<std::endl;
+	}
+	else if (nbtags == 5) {
+	  int pt_bj5 = jet_pt[bj[4]];
+	  //std::cout << "5"<< "\t" << pt_bj5 <<std::endl;
+	}
+	for (int m=1; m<6; m++) {
+	  h_jet_pt_btag->Fill(jet_pt[m],w);
+	}
+      }
     }
   }
 
@@ -72,3 +108,5 @@ void hist_btagged(){
   f.Write(); 
   f.Close();
 }
+
+// << "\t" << pt_bj2 
