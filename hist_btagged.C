@@ -34,7 +34,7 @@ void hist_btagged(){
   int nbins = 1000;
   double w = 1;
   
-  auto h_jet_pt_btag = new TH1I("jet_btagged","Jet p_{T} b-tagged;X",nbins,0.0, 2000000);
+  auto h_jet_pt_btag = new TH1I("jet_btagged","Jet p_{T} b-tagged;X",nbins,0.0, 2.4e6);
   auto h_jet_pt = new TH1F("jet_pt","Jet_P_{T}; X; Counts",nbins,0.0,2.4e6);
   auto file = TFile::Open("bbww_x1000_s170.root");
 
