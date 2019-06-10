@@ -33,7 +33,7 @@ void hist_btagged(){
   int nbins = 1000;
   double w = 1;
   
-  auto h_jet_pt_btag = new TH1I("jet_btagged","Jet p_{T} b-tagged;X",nbins,0.0,5);
+  auto h_jet_pt_btag = new TH1I("jet_btagged","Jet p_{T} b-tagged;X",nbins,0.0, 2000000);
   auto h_jet_pt = new TH1F("jet_pt","Jet_P_{T}; X; Counts",nbins,0.0,2.4e6);
   auto file = TFile::Open("bbww_x1000_s170.root");
 
@@ -44,7 +44,7 @@ void hist_btagged(){
   Int_t           jet_btagged[14];   //[n_jet]
   
   ctree->SetBranchAddress("n_jet", &n_jet);
-  ctree->SetBranchAddress("jet_pt",jet_pt);
+  ctree->SetBranchAddress("jet_pt", jet_pt);
   ctree->SetBranchAddress("jet_btagged",jet_btagged);
   ctree->SetBranchStatus("*",0);
   ctree->SetBranchStatus("n_jet",1);
@@ -62,51 +62,36 @@ void hist_btagged(){
     }
   }
 
-  int64_t bj[] = {};	
+  int64_t bj[14] = {};
   
   std::cout << "total number of entries: " << nentries << std::endl;
   
   for (int i=0; i<nentries;i++){
     ctree->GetEntry(i);
+    cout << "i = " << i << endl;
     int nbtags = 0; 
-    for (int j=0; j<n_jet; j++) {
+    for (int64_t j=0; j<n_jet; j++) {
       if(jet_btagged[j]>0){         
+	cout << "\tj= " << j << endl;
 	bj[nbtags]=j;
         nbtags++;
-
-	if (nbtags == 1) {
-	  //std::cout << "ptbj_" << nbtags << std::endl; 
-	  int pt_bj1 = jet_pt[bj[0]];
-	  //int pt_bj2 = jet_pt[bj[1]];
-	  //std::cout <<"1"<< "\t" << pt_bj1 <<std::endl;
-	}
-	else if (nbtags == 2) {
-	  int pt_bj2 = jet_pt[bj[1]];
-	  //std::cout <<"2"<< "\t" << pt_bj2 <<std::endl;
-	}
-	else if (nbtags == 3) {
-	  int pt_bj3 = jet_pt[bj[2]];
-	  //std::cout << "3"<< "\t" <<pt_bj3 <<std::endl;
-	}
-	else if (nbtags == 4) {
-	  int pt_bj4 = jet_pt[bj[3]];
-	  //std::cout << "4"<< "\t" << pt_bj4 <<std::endl;
-	}
-	else if (nbtags == 5) {
-	  int pt_bj5 = jet_pt[bj[4]];
-	  //std::cout << "5"<< "\t" << pt_bj5 <<std::endl;
-	}
-	for (int m=1; m<6; m++) {
-	  h_jet_pt_btag->Fill(jet_pt[m],w);
-	}
+	h_jet_pt_btag->Fill(jet_pt[j], w);
       }
+      //if (jet_btagged[j]>0){      //(nbtags >=1){
+	  //cout << "\t\t\tnbtags = " << nbtags << endl;
+	  //cout << "\t\t\tbj[nbtags=" << nbtags << "] = " <<  bj[nbtags] << endl;
+	  //cout << "\t\t\tjet_pt[bj[nbtags]] = " << jet_pt[bj[nbtags]] << endl;
+	  //h_jet_pt_btag->Fill(jet_pt[bj[nbtags]], w); // commented by EA
+	 // h_jet_pt_btag->Fill(jet_pt[j], w);
+      //}
+
     }
+    //return;
   }
+  
 
   h_jet_pt_btag->Write();
   
   f.Write(); 
   f.Close();
 }
-
-// << "\t" << pt_bj2 
