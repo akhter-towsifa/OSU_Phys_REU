@@ -25,6 +25,7 @@
 #include <cmath>
 #include <TChain.h>
 
+//This code graphs the events vs. jet_pt of the b-tags
 
 void hist_btagged(){
   
