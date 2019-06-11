@@ -56,38 +56,42 @@ void pt_bjet(){
     ctree->GetEntry(i);
     int nbtags = 0; 
     
-    for (int64_t j=0; j<n_jet; j++) {
+    for (int j=0; j<n_jet; j++) {
       if(jet_btagged[j]>0){         
 	bj[nbtags]=j;
         nbtags++;
 	h_jet_pt_btag->Fill(jet_pt[j], w);	
       }
       pt_bjet_all[i] = jet_pt[j];
-
-	
+      
       int n = sizeof(pt_bjet_all)/sizeof(pt_bjet_all[0]);
-      //cout << "pt_bjet_all\t\t" << pt_bjet_all[i] << endl;
+      
       sort(pt_bjet_all, pt_bjet_all+n, greater<int>());
+      //cout << "pt_bjet_all sorted\t\t" << " " << "\t\t" << pt_bjet_all[i] << endl;
     }
-    //cout << "sorted pt_bjet_all\t\t" << i << "\t\t" << pt_bjet_all[i] << endl;
+    //cout << "\t\t\t\t" << i << "\t\t\t\t" << endl;
     
     int size_pt_bjet_all = sizeof(pt_bjet_all)/sizeof(pt_bjet_all[0]);
-    //cout << "\t\tsize of pt_bjet\t\t" << size_pt_bjet_all << endl;
+    //cout << "\t\tsize of pt_bjet_all\t\t" << size_pt_bjet_all << endl;
+    pt_bjet_2jets[0] = pt_bjet_all[i][0];
+    pt_bjet_2jets[1] = pt_bjet_all[i][1];
     
-    
-    
-    if (size_pt_bjet_all == 2){
-      pt_bjet_2jets[i] = pt_bjet_all[i];
-      cout << "pt bjet 2 jets\t\t" << pt_bjet_2jets[i] << endl;
-    }
-    else if (size_pt_bjet_all > 2){
-      for (int k=0; k< 2 ; k++){
-	pt_bjet_2jets[i] = pt_bjet_all[k];
-      }
+    //if (size_pt_bjet_all >= 2){
+    //pt_bjet_2jets[0] = pt_bjet_all[i][0];
+    //pt_bjet_2jets[1] = pt_bjet_all[i][1];
+    cout << "pt bjet 2 jets-----1\t\t" << pt_bjet_2jets[0] << endl;
+    cout << "pt bjet 2 jets-----2\t\t" << pt_bjet_2jets[1] << endl;
+      
+    //}
+    //else if (size_pt_bjet_all > 2){
+    //  pt_bjet
+    //  for (int k=0; k< 2 ; k++){
+	//pt_bjet_2jets[i] = pt_bjet_all[k];
+      //}
       //cout << "pt bjet 2 jets\t\t\t" << pt_bjet_2jets[i] << endl;
-    }
-    
   }
+    
+
 
   
   
