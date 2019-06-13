@@ -26,6 +26,7 @@ void pt_bjet(){
   auto h_jet_pt_btag 	= new TH1I("jet_btagged","Jet p_{T} b-tagged;X",	nbins,0.0, 2.4e6);
   auto h_jet_pt 	= new TH1F("jet_pt","Jet_P_{T}; X; Counts",		nbins,0.0, 2.4e6);
   auto h_M_inv 		= new TH1F("M_inv", "Invariant Mass; Mass[GeV]; Counts",nbins,0.0, 1.0e7);
+  TF1 *g1	= new TF1("g1", "gaus", 500e3, 2300e3);
   auto file = TFile::Open("bbww_x1000_s170.root");
 
   TTree* ctree = (TTree*)file->Get("CollectionTree");
@@ -130,7 +131,7 @@ void pt_bjet(){
     
 	  
   }
-  
+  h_M_inv->Fit(g1, "R");
   h_M_inv->Write();
   
   f.Write();
