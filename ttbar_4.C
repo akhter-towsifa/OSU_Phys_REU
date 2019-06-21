@@ -21,7 +21,7 @@ void ttbar_4() {
   
   
   gStyle->SetOptStat(kFALSE);
-  gStyle->SetOptStat("nemi");
+  gStyle->SetOptStat("nemr");
   int w = 1; 					//weight of the bins
   int nbin = 1000;				//bin size
   
@@ -30,7 +30,7 @@ void ttbar_4() {
   auto file = TFile::Open("ttbar.root");	//Creates a pointer to the main data file
   TTree* t = (TTree*)file->Get("nominal");	//Creates a pointer to the tree
   
-  TFile f("ttbar_invariant_mass_4.root", "RECREATE");
+
   
   vector<float> *jet_pt		=0;
   vector<char>	*jet_btagged	=0;
@@ -75,33 +75,43 @@ void ttbar_4() {
     {
       if ((int)(*jet_btagged)[j]==1)
       {
-	if ( n_bjets < 1)
+	if ( n_bjets < 1)			//This loop collects the pt, phi, and eta of the highest jet within the regular jets
 	{
 	  pt_bjet_all[n_bjets] = (float)(*jet_pt)[j];
 	  phi_bjet_all[n_bjets] = (float)(*jet_phi)[j];
 	  eta_bjet_all[n_bjets] = (float)(*jet_eta)[j];
+	
+	  n_bjets++;
 	}
-	n_bjets++;
       }
     }
-    
-    n_bjets = 1;
-    
+//     cout << "n_bjets after the first for loop\t\t" << n_bjets << endl;
+
+    float ljet_m_compare = 0;
+    int n_t_candidates=0;			//a step variable that counts the number of large jets or t quarks
     for (int k=0; k<n_ljets; k++)		//Large jets
     {
-      if ((float)(*ljet_pt)[k] >= 420000 && abs((float)(*ljet_eta)[k]) <= 2.0)
+      if ((float)(*ljet_pt)[k] >= 420000 && abs((float)(*ljet_eta)[k]) <= 2.0 && n_bjets==1)		//This loop collects the pt, phi, and eta of the highest jet within the large jets
       {
+	n_t_candidates++;
+	float ljet_m_current = (float)(*ljet_m)[k];
+	ljet_m_compare = max(ljet_m_compare, ljet_m_current);
+	
+	if (ljet_m_compare == ljet_m_current)
+	{
 // 	cout << k << "\t\t" << (float)(*ljet_pt)[k] << "\t\t"  << abs((float)(*ljet_eta)[k]) << endl;
-	pt_bjet_all[n_bjets] = (float)(*ljet_pt)[k];
-	phi_bjet_all[n_bjets] = (float)(*ljet_phi)[k];
-	eta_bjet_all[n_bjets] = (float)(*ljet_eta)[k];
+	  pt_bjet_all[n_bjets] = (float)(*ljet_pt)[k];
+	  phi_bjet_all[n_bjets] = (float)(*ljet_phi)[k];
+	  eta_bjet_all[n_bjets] = (float)(*ljet_eta)[k];
+	}
       }
-      n_bjets++;
     }
-
-    if (n_bjets >= 2)
+    
+  
+//      cout << "n_bjets after the second for loop: " << n_bjets << "\t\tt-cndidates: " << n_t_candidates << endl;
+    
+    if (n_bjets == 1 && n_t_candidates > 0)			//This loop calculates the invariant mass where [0] refers to the regular jet and [1] refers to the large jet.
     {
-     
       x = pt_bjet_all[0] * cos(phi_bjet_all[0]) + pt_bjet_all[1] * cos(phi_bjet_all[1]);
       y = pt_bjet_all[0] * sin (phi_bjet_all[0]) + pt_bjet_all[1] * sin (phi_bjet_all[1]);
       z = pt_bjet_all[0] * sinh(eta_bjet_all[0]) + pt_bjet_all[1] * sinh(eta_bjet_all[1]);
@@ -113,16 +123,53 @@ void ttbar_4() {
 		+pow(pt_bjet_all[1] * sin(phi_bjet_all[1]) , 2)
 		+pow(pt_bjet_all[1] * sinh(eta_bjet_all[1]) , 2)
 	   );
-// 	cout << x << "\t\t" << y << "\t\t" << z << "\t\t" << m << endl;
-      
       M_inv = (sqrt ( pow(m , 2) - pow(x , 2) - pow(y , 2) - pow(z , 2) ));      
-      h_M_inv->Fill(M_inv, w);
-//       cout << i << "\t\tMass calculated: " << M_inv << endl;
+
+      if (M_inv <= 25000) 
+      {
+	cout << i << "\t\tMass calculated: " << M_inv << ";\tm: " << m << ";\tx: " << x << ";\ty: " << y << ";\tz: " << z <<"\n" << endl;
+	h_M_inv->Fill(M_inv, w);
+      }
     }
+  }  
+   
+  TCanvas *c = new TCanvas("canvas", "canvas", 1000, 1000);
+  h_M_inv->Draw();
     
-  }
+  
   
   file->Close();
+  TFile f("ttbar_invariant_mass_4.root", "RECREATE");
   h_M_inv->Write(); 
+  f.Close();
    
 }
+
+//The lines below are to look at the values of each of the pt components............ not part of the code
+
+// 	float px0 = pt_bjet_all[0] * cos(phi_bjet_all[0]);
+// 	float px1 = pt_bjet_all[1] * cos(phi_bjet_all[1]);
+// 	float py0 = pt_bjet_all[0] * sin(phi_bjet_all[0]);
+// 	float py1 = pt_bjet_all[1] * sin(phi_bjet_all[1]);
+// 	float pz0 = pt_bjet_all[0] * sinh(eta_bjet_all[0]);
+// 	float pz1 = pt_bjet_all[1] * sinh(eta_bjet_all[1]);
+// 	float temp_m = 2 * sqrt( pow(pt_bjet_all[0] * cos(phi_bjet_all[0]) , 2)
+// 		+pow(pt_bjet_all[0] * sin(phi_bjet_all[0]) , 2)
+// 		+pow(pt_bjet_all[0] * sinh(eta_bjet_all[0]) , 2)
+// 	   ) * sqrt( pow(pt_bjet_all[1] * cos(phi_bjet_all[1]) , 2)
+// 		+pow(pt_bjet_all[1] * sin(phi_bjet_all[1]) , 2)
+// 		+pow(pt_bjet_all[1] * sinh(eta_bjet_all[1]) , 2)
+// 	   );
+// 	cout << "px0\t\t" << px0 << endl;
+// 	cout << "px1\t\t" << px1 << endl;
+// 	cout << "py0\t\t" << py0 << endl;
+// 	cout << "py1\t\t" << py1 << endl;
+// 	cout << "pz0\t\t" << pz0 << endl;
+// 	cout << "pz1\t\t" << pz1 << endl;
+// 	cout << "ptotal\t\t" << temp_m << endl;
+/*
+
+    #if defined(R__FAST_MATH)
+      inline Bool_t TMath::IsNaN(Float_t M_inv);	//{return isnan(M_inv);}
+      cout << i << endl;
+    #endif*/
