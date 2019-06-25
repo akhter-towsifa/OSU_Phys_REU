@@ -14,6 +14,7 @@
 #include <cmath>
 #include "TCanvas.h"
 #include "TLegend.h"
+#include "TLorentzVector.h"
 
 /*This code stores all the jets that have a b particle in it. Then it selects
 two of the most energetic leading b-jets [pt_bjet].*/
@@ -42,6 +43,7 @@ void leading_jet_pt(){
   Int_t           jet_btagged[14];   	//[n_jet]
   Float_t         jet_eta[14];   	//[n_jet]
   Float_t         jet_phi[14];  	//[n_jet]
+  Float_t         jet_e[14];  		//[n_jet]
   Float_t		w;
   
   ctree->SetBranchAddress("n_jet", &n_jet);
@@ -49,6 +51,7 @@ void leading_jet_pt(){
   ctree->SetBranchAddress("jet_btagged",jet_btagged);
   ctree->SetBranchAddress("jet_eta", jet_eta);
   ctree->SetBranchAddress("jet_phi", jet_phi);
+  ctree->SetBranchAddress("jet_e", jet_e);
   ctree->SetBranchAddress("weight", &w);
   
   ctree->SetBranchStatus("*",0);
@@ -58,48 +61,52 @@ void leading_jet_pt(){
   ctree->SetBranchStatus("jet_btagged",1);
   ctree->SetBranchStatus("jet_eta",1);
   ctree->SetBranchStatus("jet_phi",1);
+  ctree->SetBranchStatus("jet_e", 1);
   ctree->SetBranchStatus("weight", 1);
 
   int nentries = ctree->GetEntries();
   
 //The following loop creates a list pt_bjet_2jets that contains 2 b-jets  
 
-  float pt_bjet_all[20000][2];		//stores the pt of the events with greater than 2 b-jets in a 2-dimensional array.
-  float phi_bjet_all[20000][2] = {0};	//stores the phi angles of all of the jets in a 2-dimensional array
-  float eta_bjet_all[20000][2] = {0};  //stores the eta angles of all of the jets in a 2-dimensional array
+  float pt_bjet_all[2] = {0};		//stores the pt of the events with greater than 2 b-jets in a 2-dimensional array.
+  float phi_bjet_all[2] = {0};		//stores the phi angles of all of the jets in a 2-dimensional array
+  float eta_bjet_all[2] = {0};  	//stores the eta angles of all of the jets in a 2-dimensional array
  
-  float pt_w_all[20000][4] = {0};
-  float phi_w_all[20000][4] = {0};
-  float eta_w_all[20000][4] = {0};
+  float pt_w_all[20000][2] = {0};
+  float phi_w_all[20000][2] = {0};
+  float eta_w_all[20000][2] = {0};
  
-  float x[20000] = {0};			//stores the (P_x,0 	+ P_x,1) 	values
-  float y[20000] = {0};			//stores the (P_y,0 	+ P_y,1) 	values
-  float z[20000] = {0};			//stores the (P_z,0 	+ P_z,1) 	values
-  float t[20000] = {0};			//stores the (P_total,1 + P_total_2) 	values
-  float M_inv[20000] = {0};		//stores the invariant mass values
+  float x = 0;			//stores the (P_x,0 	+ P_x,1) 	values within each loop
+  float y = 0;			//stores the (P_y,0 	+ P_y,1) 	values within each loop 
+  float z = 0;			//stores the (P_z,0 	+ P_z,1) 	values within each loop
+  float t = 0;			//stores the (P_total,1 + P_total_2) 	values within each loop
+  float M_inv = 0;		//stores the invariant mass value within each loop
   
-  float w_x[20000] = {0};
-  float w_y[20000] = {0};
-  float w_z[20000] = {0};
-  float w_t[20000] = {0};
-  float w_M_inv[2000] = {0};
+  float w_x = 0;
+  float w_y = 0;
+  float w_z = 0;
+  float w_t = 0;
+  float w_M_inv = 0;
   
   for (int i=0; i<nentries;i++){
     ctree->GetEntry(i);
     int nbtags = 0;
+    TLorentzVector Hb1;
+    TLorentzVector Hb2;
+    TLorentzVector HiggsBosonb;
+    
     for (int j=0; j<n_jet; j++) {
+      if(jet_btagged[j]>0) h_jet_pt_btag->Fill(jet_pt[j], w_2); 	//Creates histogram for b-jets
       
       if(jet_btagged[j]>0 && nbtags < 2){
 	nbtags++;
 
 	if (nbtags==1) h_leading_bjet_1->Fill(jet_pt[j]);		//Creates histogram for the leading b-jet
 	if (nbtags==2) h_leading_bjet_2->Fill(jet_pt[j]);		//Creates histogram for the subleading b-jet
-	
-	h_jet_pt_btag->Fill(jet_pt[j], w_2);				//Creates histogram for b-jets
-	
-	pt_bjet_all[i][nbtags-1] = jet_pt[j];				
-	phi_bjet_all[i][nbtags-1] = jet_phi[j];
-	eta_bjet_all[i][nbtags-1] = jet_eta[j];
+
+	pt_bjet_all[nbtags-1] = jet_pt[j];				
+	phi_bjet_all[nbtags-1] = jet_phi[j];
+	eta_bjet_all[nbtags-1] = jet_eta[j];
 	
       } // btagging
       
@@ -117,40 +124,39 @@ void leading_jet_pt(){
     } // n_jets
     
       if (nbtags>=2) {
-      
-      //cout << "Entry: " << i << ";\tn_b-tagged: " << nbtags << ";\tpt1 = " << pt_bjet_2jets[i][0] << ";\tpt2 = " << pt_bjet_2jets[i][1] << endl << endl;
+
           
-	x[i] = pt_bjet_all[i][0] * cos(phi_bjet_all[i][0]) + pt_bjet_all[i][1] * cos(phi_bjet_all[i][1]);
-	y[i] = pt_bjet_all[i][0] * sin(phi_bjet_all[i][0]) + pt_bjet_all[i][1] * sin(phi_bjet_all[i][1]);
-	z[i] = pt_bjet_all[i][0] * sinh(eta_bjet_all[i][0]) + pt_bjet_all[i][1] * sinh(eta_bjet_all[i][1]);
-	t[i] = sqrt( pow(pt_bjet_all[i][0] * cos(phi_bjet_all[i][0]) , 2)
-		    +pow(pt_bjet_all[i][0] * sin(phi_bjet_all[i][0]) , 2)
-		    +pow(pt_bjet_all[i][0] * sinh(eta_bjet_all[i][0]) , 2)
+	x = pt_bjet_all[0] * cos(phi_bjet_all[0]) + pt_bjet_all[1] * cos(phi_bjet_all[1]);
+	y = pt_bjet_all[0] * sin(phi_bjet_all[0]) + pt_bjet_all[1] * sin(phi_bjet_all[1]);
+	z = pt_bjet_all[0] * sinh(eta_bjet_all[0]) + pt_bjet_all[1] * sinh(eta_bjet_all[1]);
+	t = sqrt( pow(pt_bjet_all[0] * cos(phi_bjet_all[0]) , 2)
+		    +pow(pt_bjet_all[0] * sin(phi_bjet_all[0]) , 2)
+		    +pow(pt_bjet_all[0] * sinh(eta_bjet_all[0]) , 2)
 	      )
-	      +sqrt( pow(pt_bjet_all[i][1] * cos(phi_bjet_all[i][1]) , 2)
-		    +pow(pt_bjet_all[i][1] * sin(phi_bjet_all[i][1]) , 2)
-		    +pow(pt_bjet_all[i][1] * sinh(eta_bjet_all[i][1]) , 2)
+	      +sqrt( pow(pt_bjet_all[1] * cos(phi_bjet_all[1]) , 2)
+		    +pow(pt_bjet_all[1] * sin(phi_bjet_all[1]) , 2)
+		    +pow(pt_bjet_all[1] * sinh(eta_bjet_all[1]) , 2)
 	      );
 	      
-	M_inv[i] = (sqrt ( pow(t[i] , 2) - pow(x[i] , 2) - pow(y[i] , 2) - pow(z[i] , 2) )) / 1000;
-	h_M_inv->Fill(M_inv[i], w);
+	M_inv = (sqrt ( pow(t , 2) - pow(x , 2) - pow(y , 2) - pow(z , 2) )) / 1000;
+	h_M_inv->Fill(M_inv, w);
 	
 	///////////////////////////////Below is the inv mass calculation for W particles
 	
-	w_x[i] = pt_w_all[i][2] * cos(phi_w_all[i][2]) + pt_w_all[i][3] * cos(phi_w_all[i][3]);
-	w_y[i] = pt_w_all[i][2] * sin(phi_w_all[i][2]) + pt_w_all[i][3] * sin(phi_w_all[i][3]);
-	w_z[i] = pt_w_all[i][2] * sinh(eta_w_all[i][2]) + pt_w_all[i][3] * sinh(eta_w_all[i][3]);
-	w_t[i] = sqrt( pow(pt_w_all[i][2] * cos(phi_w_all[i][2]) , 2)
-		    +pow(pt_w_all[i][2] * sin(phi_w_all[i][2]) , 2)
-		    +pow(pt_w_all[i][2] * sinh(eta_w_all[i][2]) , 2)
+	w_x = pt_w_all[i][0] * cos(phi_w_all[i][0]) + pt_w_all[i][1] * cos(phi_w_all[i][1]);
+	w_y = pt_w_all[i][0] * sin(phi_w_all[i][0]) + pt_w_all[i][1] * sin(phi_w_all[i][1]);
+	w_z = pt_w_all[i][0] * sinh(eta_w_all[i][0]) + pt_w_all[i][1] * sinh(eta_w_all[i][1]);
+	w_t = sqrt( pow(pt_w_all[i][0] * cos(phi_w_all[i][0]) , 2)
+		    +pow(pt_w_all[i][0] * sin(phi_w_all[i][0]) , 2)
+		    +pow(pt_w_all[i][0] * sinh(eta_w_all[i][0]) , 2)
 	      )
-	      +sqrt( pow(pt_w_all[i][3] * cos(phi_w_all[i][3]) , 2)
-		    +pow(pt_w_all[i][3] * sin(phi_w_all[i][3]) , 2)
-		    +pow(pt_w_all[i][3] * sinh(eta_w_all[i][3]) , 2)
+	      +sqrt( pow(pt_w_all[i][1] * cos(phi_w_all[i][1]) , 2)
+		    +pow(pt_w_all[i][1] * sin(phi_w_all[i][1]) , 2)
+		    +pow(pt_w_all[i][1] * sinh(eta_w_all[i][1]) , 2)
 	      );
 	      
-	w_M_inv[i] = (sqrt ( pow(w_t[i] , 2) - pow(w_x[i] , 2) - pow(w_y[i] , 2) - pow(w_z[i] , 2) )) / 1000;
-	h_w_inv->Fill(w_M_inv[i], w);
+	w_M_inv = (sqrt ( pow(w_t , 2) - pow(w_x , 2) - pow(w_y, 2) - pow(w_z , 2) )) / 1000;
+	h_w_inv->Fill(w_M_inv, w);
 	    
 	} // jets in an event
 
