@@ -99,7 +99,7 @@ void bkg_ttbar() {
     if (n_bjets==1 && n_t_candidates>0)
     {
       Minv_total = Minv1 + Minv2;
-      cout << i << "\tMass: " << Minv_total.M() << endl;
+//       cout << i << "\tMass: " << Minv_total.M() << endl;
       h_M_inv->Fill(Minv_total.M(), w);
     }
     
