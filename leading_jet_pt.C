@@ -14,14 +14,13 @@
 #include <cmath>
 #include "TCanvas.h"
 #include "TLegend.h"
-#include "TLorentzVector.h"
+
 
 /*This code stores all the jets that have a b particle in it. Then it selects
 two of the most energetic leading b-jets [pt_bjet].*/
 
 void leading_jet_pt(){
   
-  gStyle->SetOptStat(kFALSE);
   gStyle->SetOptStat("nemr");
   int nbins = 1000;
   int w_2 = 1;			//weight
@@ -32,7 +31,8 @@ void leading_jet_pt(){
   auto h_leading_bjet_2 	= new TH1F("h_leading_bjet_2", "Leading and Subleading b-Jets; Mass[MeV]; Counts", nbins, 0.0, 2.0e6);
   auto h_M_inv 			= new TH1F("M_inv", "Invariant Mass of Higgs Boson from the b-Jets; Mass[GeV]; Counts",	nbins,0.0, 200.0);
   auto h_w_pt_btag		= new TH1F("W_particle", "W P_{T}; Mass[MeV]; Counts", 		nbins, 0.0, 1.0e6);
-  auto h_w_inv			= new TH1F("W_inv", "Invariant mass of W; mass[GeV]; Counts", 	nbins, 0.0, 100.0);
+  auto h_w_inv			= new TH1F("W1_inv", "Invariant mass of W; mass[GeV]; Counts", 	nbins, 0.0, 1000.0);
+  auto h_w2_inv			= new TH1F("W2_inv", "Invariant mass of 2nd W; mass[GeV]; Counts", 	nbins, 0.0, 1800.0);
   
   auto file = TFile::Open("bbww_x1000_s170.root");
 
@@ -72,9 +72,9 @@ void leading_jet_pt(){
   float phi_bjet_all[2] = {0};		//stores the phi angles of all of the jets in a 2-dimensional array
   float eta_bjet_all[2] = {0};  	//stores the eta angles of all of the jets in a 2-dimensional array
  
-  float pt_w_all[20000][2] = {0};
-  float phi_w_all[20000][2] = {0};
-  float eta_w_all[20000][2] = {0};
+  float pt_w_all[20000][4] = {0};
+  float phi_w_all[20000][4] = {0};
+  float eta_w_all[20000][4] = {0};
  
   float x = 0;			//stores the (P_x,0 	+ P_x,1) 	values within each loop
   float y = 0;			//stores the (P_y,0 	+ P_y,1) 	values within each loop 
@@ -88,12 +88,15 @@ void leading_jet_pt(){
   float w_t = 0;
   float w_M_inv = 0;
   
+  float w_2_x = 0;
+  float w_2_y = 0;
+  float w_2_z = 0;
+  float w_2_t = 0;
+  float w_2_M_inv = 0;
+  
   for (int i=0; i<nentries;i++){
     ctree->GetEntry(i);
     int nbtags = 0;
-    TLorentzVector Hb1;
-    TLorentzVector Hb2;
-    TLorentzVector HiggsBosonb;
     
     for (int j=0; j<n_jet; j++) {
       if(jet_btagged[j]>0) h_jet_pt_btag->Fill(jet_pt[j], w_2); 	//Creates histogram for b-jets
@@ -141,7 +144,7 @@ void leading_jet_pt(){
 	M_inv = (sqrt ( pow(t , 2) - pow(x , 2) - pow(y , 2) - pow(z , 2) )) / 1000;
 	h_M_inv->Fill(M_inv, w);
 	
-	///////////////////////////////Below is the inv mass calculation for W particles
+	////////Below is the inv mass calculation for W particles/////////
 	
 	w_x = pt_w_all[i][0] * cos(phi_w_all[i][0]) + pt_w_all[i][1] * cos(phi_w_all[i][1]);
 	w_y = pt_w_all[i][0] * sin(phi_w_all[i][0]) + pt_w_all[i][1] * sin(phi_w_all[i][1]);
@@ -157,6 +160,23 @@ void leading_jet_pt(){
 	      
 	w_M_inv = (sqrt ( pow(w_t , 2) - pow(w_x , 2) - pow(w_y, 2) - pow(w_z , 2) )) / 1000;
 	h_w_inv->Fill(w_M_inv, w);
+	
+	
+	
+	w_2_x = pt_w_all[i][2] * cos(phi_w_all[i][2]) + pt_w_all[i][3] * cos(phi_w_all[i][3]);
+	w_2_y = pt_w_all[i][2] * sin(phi_w_all[i][2]) + pt_w_all[i][3] * sin(phi_w_all[i][3]);
+	w_2_z = pt_w_all[i][2] * sinh(eta_w_all[i][2]) + pt_w_all[i][3] * sinh(eta_w_all[i][3]);
+	w_2_t = sqrt( pow(pt_w_all[i][2] * cos(phi_w_all[i][2]) , 2)
+		    +pow(pt_w_all[i][2] * sin(phi_w_all[i][2]) , 2)
+		    +pow(pt_w_all[i][2] * sinh(eta_w_all[i][2]) , 2)
+	      )
+	      +sqrt( pow(pt_w_all[i][3] * cos(phi_w_all[i][3]) , 2)
+		    +pow(pt_w_all[i][3] * sin(phi_w_all[i][3]) , 2)
+		    +pow(pt_w_all[i][3] * sinh(eta_w_all[i][3]) , 2)
+	      );
+	      
+	w_2_M_inv = (sqrt ( pow(w_2_t , 2) - pow(w_2_x , 2) - pow(w_2_y, 2) - pow(w_2_z , 2) )) / 1000;
+	h_w2_inv->Fill(w_2_M_inv, w);
 	    
 	} // jets in an event
 
@@ -177,15 +197,15 @@ void leading_jet_pt(){
   h_leading_bjet_2->Write();
   
   c2 = new TCanvas("c2", "Particle Jets from PP collision", 2000, 1000);
-  c2 -> Divide (2,3);
+  c2 -> Divide (3,3);
   
   c2->cd(1);
   h_jet_pt->Draw();
   
-  c2->cd(3);
+  c2->cd(4);
   h_jet_pt_btag->Draw();
   
-  c2->cd(2);
+  c2->cd(7);
   h_leading_bjet_2->Draw();
   h_leading_bjet_1->Draw("same");
   h_leading_bjet_2->SetLineColor(2);
@@ -194,15 +214,18 @@ void leading_jet_pt(){
   legend->AddEntry(h_leading_bjet_1,"Leading b-Jet");
   legend->AddEntry("h_leading_bjet_2","Subleading b-Jet");
   legend->Draw();
-  
-  c2->cd(4);
+
+  c2->cd(5);
   h_M_inv->Draw();
   
-  c2->cd(5);
+  c2->cd(3);
   h_w_pt_btag->Draw();
   
   c2->cd(6);
   h_w_inv->Draw();
+  
+  c2->cd(9);
+  h_w2_inv->Draw();
  
   
   f.Close();
