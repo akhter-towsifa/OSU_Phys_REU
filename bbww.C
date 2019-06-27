@@ -22,7 +22,7 @@ void bbww(){
   
   gStyle->SetOptStat("nemr");
   int nbins = 1000;
-  int w = 1;				//weight
+  int w = 1;			//weight
   
   auto h_jet_pt 		= new TH1F("jet_pt","Jet_P_{T}; Mass [MeV]; Counts",		nbins,0.0, 1.0e6);
   auto h_jet_pt_btag 		= new TH1I("jet_btagged","Jet p_{T} b-tagged;Mass[MeV]",	nbins,0.0, 1.0e6);
@@ -32,8 +32,11 @@ void bbww(){
   auto h_w_pt_btag		= new TH1F("W_particle", "W P_{T}; Mass[MeV]; Counts", 		nbins, 0.0, 2.0e6);
   auto h_w_inv			= new TH1F("W1_inv", "Invariant mass of W; mass[MeV]; Counts", 	nbins, 0.0, 2.0e6);
   auto h_w2_inv			= new TH1F("W2_inv", "Invariant mass of 2nd W; mass[MeV]; Counts", 	nbins, 0.0, 2.0e6);
-
+  auto h_M_inv_2 		= new TH1F("M_inv_2", "Invariant Mass of the S particle from the W bosons; Mass[MeV]; Counts",nbins,0.0, 2.0e6);
+  auto h_X	 		= new TH1F("X_M_inv", "Invariant Mass of the X Particle; Mass[MeV]; Counts",nbins,0.0, 4.0e6);
+  
   auto file = TFile::Open("bbww_x1000_s170.root");
+  auto bkg = TFile::Open("bkg_ttbar.root");
 
   TTree* ctree = (TTree*)file->Get("CollectionTree");
   
@@ -67,23 +70,24 @@ void bbww(){
   {
     ctree->GetEntry(i);
 
-    TLorentzVector HiggsBosonb;
-    TLorentzVector Jet1;
-    TLorentzVector Jet2;
-    TLorentzVector W_1;
-    TLorentzVector W_1_a;
-    TLorentzVector W_1_b;
-    TLorentzVector W_2;
-    TLorentzVector W_2_a;
-    TLorentzVector W_2_b;
+    TLorentzVector HiggsBosonb;			//Higgs Boson from the two b jets
+    TLorentzVector Jet1;			//1st b jet
+    TLorentzVector Jet2;			//2nd b jet
+    TLorentzVector W_1;				//1st W Boson
+    TLorentzVector W_1_a;			//1st quark jet from the 1st W Boson
+    TLorentzVector W_1_b;			//2nd quark jet from the 1st W Boson
+    TLorentzVector W_2;				//2nd W Boson
+    TLorentzVector W_2_a;			//1st quark jet from the 2nd W Boson 
+    TLorentzVector W_2_b;			//2nd quark jet from the 2nd W Boson
+    TLorentzVector HiggsBosonw;			//2nd Higgs Boson from the W bosons
+    TLorentzVector X;				//X particle from the diHiggs
 
-    cout << i << endl;
     
     int nbtags = 0;
     int nwtags = 0;
     
     for (int j=0; j<n_jet; j++)
-    { cout << "\t" << j << endl;
+    {
       if (jet_btagged[j]>0 && nbtags < 2)
       {
 	
@@ -91,7 +95,6 @@ void bbww(){
 	{ 
 	  h_leading_bjet_1->Fill(jet_pt[j]);			//Creates histogram for the leading b-jet
 	  Jet1.SetPtEtaPhiE(jet_pt[j], jet_eta[j], jet_phi[j], jet_e[j]);
-	  
 	}
       
 	if (nbtags == 1)
@@ -110,14 +113,14 @@ void bbww(){
 	h_w_pt_btag->Fill(jet_pt[j], w);
 	if (nwtags == 0)
 	{ 
-	  cout << "\t\t1: " << jet_pt[j] << "\t" << jet_eta[j] << "\t" << jet_phi[j] << "\t" << jet_e[j] << endl;
+// 	  cout << "\t\t1: " << jet_pt[j] << "\t" << jet_eta[j] << "\t" << jet_phi[j] << "\t" << jet_e[j] << endl;
 	  W_1_a.SetPtEtaPhiE(jet_pt[j], jet_eta[j], jet_phi[j], jet_e[j]);
 	  
 	}
       
 	if (nwtags == 1)
 	{
-	  cout << "\t\t2: " << jet_pt[j] << "\t" << jet_eta[j] << "\t" << jet_phi[j] << "\t" << jet_e[j] << endl;
+// 	  cout << "\t\t2: " << jet_pt[j] << "\t" << jet_eta[j] << "\t" << jet_phi[j] << "\t" << jet_e[j] << endl;
 	  W_1_b.SetPtEtaPhiE(jet_pt[j], jet_eta[j], jet_phi[j], jet_e[j]);
 	  W_1 = W_1_a + W_1_b;
 	  h_w_inv->Fill(W_1.M(), w);
@@ -125,33 +128,34 @@ void bbww(){
 	
 	if (nwtags == 2)
 	{ 
-	  cout << "\t\t3: " << jet_pt[j] << "\t" << jet_eta[j] << "\t" << jet_phi[j] << "\t" << jet_e[j] << endl;
-	  W_2_a.SetPtEtaPhiE(jet_pt[j], jet_eta[j], jet_phi[j], jet_e[j]);
-	  
+// 	  cout << "\t\t3: " << jet_pt[j] << "\t" << jet_eta[j] << "\t" << jet_phi[j] << "\t" << jet_e[j] << endl;
+	  W_2_a.SetPtEtaPhiE(jet_pt[j], jet_eta[j], jet_phi[j], jet_e[j]);	  
 	}
       
 	if (nwtags == 3)
 	{
-	  cout << "\t\t4: " << jet_pt[j] << "\t" << jet_eta[j] << "\t" << jet_phi[j] << "\t" << jet_e[j] << endl;
+// 	  cout << "\t\t4: " << jet_pt[j] << "\t" << jet_eta[j] << "\t" << jet_phi[j] << "\t" << jet_e[j] << endl;
 	  W_2_b.SetPtEtaPhiE(jet_pt[j], jet_eta[j], jet_phi[j], jet_e[j]);
 	  W_2 = W_2_a + W_2_b;
 	  h_w2_inv->Fill(W_2.M(), w);
+// 	  HiggsBosonw = W_1 + W_2;
+// 	  h_M_inv_2->Fill(HiggsBosonw.M(), w);
 	}
+	
 	nwtags++;
       }
+      HiggsBosonw = W_1 + W_2;
+      h_M_inv_2->Fill(HiggsBosonw.M(), w);
+      
+      X = HiggsBosonb + HiggsBosonw;
+      h_X->Fill(X.M(), w);
     }
-    
-//     if (nbtags >= 2)
-//     {
-//       HiggsBosonb = Jet1 + Jet2;
-//       h_M_inv->Fill(HiggsBosonb.M(), w);
-//     }
     
    
     for(int k = 0; k< n_jet; k++)
     {
       h_jet_pt->Fill( jet_pt[k], w);				//Creates all the jet_pt histogram
-      if (jet_btagged[k]>0) h_jet_pt_btag->Fill(jet_pt[k], w);
+      if (jet_btagged[k]>0) h_jet_pt_btag->Fill(jet_pt[k], w);	//Creates the jet_pt btagged histogram
     }
   }
   
@@ -166,6 +170,8 @@ void bbww(){
   h_w_pt_btag	->Write();
   h_w_inv	->Write();
   h_w2_inv	->Write();
+  h_M_inv_2	->Write();
+  h_X		->Write();
   
   c = new TCanvas("c", "bbWW Particle Jets from PP Collision", 2000, 1000);
   c -> Divide (3,3);
@@ -173,10 +179,10 @@ void bbww(){
   c -> cd(1);
   h_jet_pt -> Draw();
   
-  c -> cd(4);
+  c -> cd(2);
   h_jet_pt_btag -> Draw();
   
-  c -> cd(7);
+  c -> cd(3);
   h_leading_bjet_2 -> Draw();
   h_leading_bjet_1 -> Draw("same");
   h_leading_bjet_2 -> SetLineColor(2);
@@ -186,17 +192,27 @@ void bbww(){
   legend->AddEntry("h_leading_bjet_2","Subleading b-Jet");
   legend->Draw();
   
-  c -> cd(5);
+  c -> cd(7);
   h_M_inv -> Draw();
   
-  c -> cd(3);
+  c -> cd(8);
+  h_M_inv_2 -> Draw();
+  
+  c -> cd(9);
+  h_X -> Draw();
+  
+  c -> cd(4);
   h_w_pt_btag -> Draw();
   
-  c -> cd(6);
+  c -> cd(5);
   h_w_inv -> Draw();
   
-  c-> cd(9);
+  c-> cd(6);
   h_w2_inv -> Draw();
+  
+  /////////////
+  
+
   
   f.Close();
 }
