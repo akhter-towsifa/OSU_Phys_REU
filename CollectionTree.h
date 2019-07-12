@@ -1,6 +1,7 @@
+CollectionTree->MakeClass("CollectionTree")
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Jun  4 13:09:13 2019 by ROOT version 6.06/06
+// Fri Jun 28 11:44:24 2019 by ROOT version 6.06/06
 // from TTree CollectionTree/
 // found on file: bbww_x1000_s170.root
 //////////////////////////////////////////////////////////
@@ -29,6 +30,16 @@ public :
    Float_t         jet_e[14];   //[n_jet]
    Float_t         jet_Jvt[14];   //[n_jet]
    Int_t           jet_btagged[14];   //[n_jet]
+   Int_t           n_ljet;
+   Float_t         ljet_pt[8];   //[n_ljet]
+   Float_t         ljet_eta[8];   //[n_ljet]
+   Float_t         ljet_phi[8];   //[n_ljet]
+   Float_t         ljet_e[8];   //[n_ljet]
+   Int_t           n_tjet;
+   Float_t         tjet_pt[28];   //[n_tjet]
+   Float_t         tjet_eta[28];   //[n_tjet]
+   Float_t         tjet_phi[28];   //[n_tjet]
+   Float_t         tjet_e[28];   //[n_tjet]
    Int_t           n_electrons;
    Float_t         electrons_pt[1];   //[n_electrons]
    Float_t         electrons_eta[1];   //[n_electrons]
@@ -65,6 +76,16 @@ public :
    TBranch        *b_jet_e;   //!
    TBranch        *b_jet_Jvt;   //!
    TBranch        *b_jet_btagged;   //!
+   TBranch        *b_n_ljet;   //!
+   TBranch        *b_ljet_pt;   //!
+   TBranch        *b_ljet_eta;   //!
+   TBranch        *b_ljet_phi;   //!
+   TBranch        *b_ljet_e;   //!
+   TBranch        *b_n_tjet;   //!
+   TBranch        *b_tjet_pt;   //!
+   TBranch        *b_tjet_eta;   //!
+   TBranch        *b_tjet_phi;   //!
+   TBranch        *b_tjet_e;   //!
    TBranch        *b_n_electrons;   //!
    TBranch        *b_electrons_pt;   //!
    TBranch        *b_electrons_eta;   //!
@@ -170,9 +191,19 @@ void CollectionTree::Init(TTree *tree)
    fChain->SetBranchAddress("jet_e", jet_e, &b_jet_e);
    fChain->SetBranchAddress("jet_Jvt", jet_Jvt, &b_jet_Jvt);
    fChain->SetBranchAddress("jet_btagged", jet_btagged, &b_jet_btagged);
+   fChain->SetBranchAddress("n_ljet", &n_ljet, &b_n_ljet);
+   fChain->SetBranchAddress("ljet_pt", ljet_pt, &b_ljet_pt);
+   fChain->SetBranchAddress("ljet_eta", ljet_eta, &b_ljet_eta);
+   fChain->SetBranchAddress("ljet_phi", ljet_phi, &b_ljet_phi);
+   fChain->SetBranchAddress("ljet_e", ljet_e, &b_ljet_e);
+   fChain->SetBranchAddress("n_tjet", &n_tjet, &b_n_tjet);
+   fChain->SetBranchAddress("tjet_pt", tjet_pt, &b_tjet_pt);
+   fChain->SetBranchAddress("tjet_eta", tjet_eta, &b_tjet_eta);
+   fChain->SetBranchAddress("tjet_phi", tjet_phi, &b_tjet_phi);
+   fChain->SetBranchAddress("tjet_e", tjet_e, &b_tjet_e);
    fChain->SetBranchAddress("n_electrons", &n_electrons, &b_n_electrons);
    fChain->SetBranchAddress("electrons_pt", &electrons_pt, &b_electrons_pt);
-   fChain->SetBranchAddress("electrons_eta", &electrons_eta, &b_electrons_eta); 
+   fChain->SetBranchAddress("electrons_eta", &electrons_eta, &b_electrons_eta);
    fChain->SetBranchAddress("electrons_phi", &electrons_phi, &b_electrons_phi);
    fChain->SetBranchAddress("electrons_e", &electrons_e, &b_electrons_e);
    fChain->SetBranchAddress("electrons_etcone20", &electrons_etcone20, &b_electrons_etcone20);
