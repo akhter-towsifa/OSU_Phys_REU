@@ -16,7 +16,7 @@
 #include "TLegend.h" 
 #include "TLorentzVector.h"
 
-//This code finds the large jet and (jet) b-tagged Higgs Boson mass using the bbww_x2000_s1500 file
+//This code finds the large jet and Higgs Boson, S masses using the bbww_x2000_s1500 file
 
 void a_1(){
   gStyle -> SetOptStat("nemr");
