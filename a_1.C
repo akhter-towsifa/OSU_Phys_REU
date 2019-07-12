@@ -122,7 +122,7 @@ void a_1(){
       }
     }  
     X = H + S;
-    h_X->Fill(X.M(), w);  
+    if (X.M() > 0) h_X->Fill(X.M(), w);  
   } 
   
   file->Close();
