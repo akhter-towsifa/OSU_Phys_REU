@@ -16,7 +16,7 @@
 #include "TLegend.h" 
 #include "TLorentzVector.h"
 
-//This code finds the large jet and Higgs Boson, S masses using the bbww_x2000_s1500 file
+//This code finds the large jet and Higgs Boson, S masses using the bbww_x2000_s1500 file (large jet: 1H, >1 W's)
 
 void a_1(){
   gStyle -> SetOptStat("nemr");
@@ -28,29 +28,19 @@ void a_1(){
   auto h_W1 = new TH1F("M_{inv} W1", "Invariant Mass of first W Boson from large jet; Mass [MeV]", nbins, 0.0, 2.0e5);
   auto h_W2 = new TH1F("M_{inv} W2", "Invariant Mass of second W Boson from large jet; Mass [MeV]", nbins, 0.0, 2.0e5);
   auto h_S = new TH1F("M_{inv} S", "Invariant Mass of the S particle from W's; Mass [MeV]", nbins, 0.0, 3.0e6);
+  auto h_S_totalnumber = new TH1F("M_{inv} S number", "Invariant Mass of the S particle from W's; Mass [MeV]", nbins, 0.0, 3.0e6);
   auto h_X = new TH1F("M_{inv} X", "Invariant Mass of the X Particle from large jet Higgs and W; Mass [MeV]", nbins, 0.0, 3.0e6);
+  auto h_X_totalnumber = new TH1F("M_{inv} X number", "Invariant Mass of the X Particle from large jet Higgs and W; Mass [MeV]", nbins, 0.0, 3.0e6);
   
   auto file = TFile::Open("bbww_x2000_s1500.root");
   TTree* ctree = (TTree*)file->Get("CollectionTree");
   
-  Int_t           n_jet;
-  Float_t         jet_pt[14];		//[n_jet]
-  Int_t           jet_btagged[14];	//[n_jet]
-  Float_t         jet_eta[14];		//[n_jet]
-  Float_t         jet_phi[14];		//[n_jet] 
-  Float_t         jet_e[14];		//[n_jet]
   Int_t           n_ljet;
   Float_t         ljet_pt[9];   //[n_ljet]
   Float_t         ljet_eta[9];   //[n_ljet]
   Float_t         ljet_phi[9];   //[n_ljet]
   Float_t         ljet_e[9];   //[n_ljet]
   
-  ctree->SetBranchAddress("n_jet", &n_jet);
-  ctree->SetBranchAddress("jet_pt", jet_pt);
-  ctree->SetBranchAddress("jet_btagged",jet_btagged);
-  ctree->SetBranchAddress("jet_eta", jet_eta);
-  ctree->SetBranchAddress("jet_phi", jet_phi);
-  ctree->SetBranchAddress("jet_e", jet_e);
   ctree->SetBranchAddress("n_ljet", &n_ljet);
   ctree->SetBranchAddress("ljet_pt", ljet_pt);
   ctree->SetBranchAddress("ljet_eta", ljet_eta);
@@ -59,12 +49,6 @@ void a_1(){
   
   ctree->SetBranchStatus("*",0);
   
-  ctree->SetBranchStatus("n_jet",1);
-  ctree->SetBranchStatus("jet_pt",1);
-  ctree->SetBranchStatus("jet_btagged",1);
-  ctree->SetBranchStatus("jet_eta",1);
-  ctree->SetBranchStatus("jet_phi",1);
-  ctree->SetBranchStatus("jet_e", 1);
   ctree->SetBranchStatus("n_ljet",1);
   ctree->SetBranchStatus("ljet_pt", 1);
   ctree->SetBranchStatus("ljet_eta", 1);
@@ -85,7 +69,6 @@ void a_1(){
 
     
     int count_w = 0;					//counting the number of W's
-    float ljet_compare = 0;				//to seclude the higgs boson from the W's
     
     for (int j=0; j<n_ljet; j++)			//loops over all the large jets in each entry
     {
@@ -117,12 +100,15 @@ void a_1(){
 	  }
 	}
 	S = W1 + W2;
-	h_S->Fill(S.M(), w);
+	if(S.M()>0) h_S->Fill(S.M(), w);
+	if(S.M() > 1400e3 && S.M() < 1550e3) h_S_totalnumber->Fill(S.M(), w);
 	
       }
     }  
     X = H + S;
-    if (X.M() > 0) h_X->Fill(X.M(), w);  
+    if (X.M() > 0) h_X->Fill(X.M(), w);
+    if (X.M() > 1900e3 && X.M() < 2050e3) h_X_totalnumber->Fill(X.M(), w);
+    
   } 
   
   file->Close();
@@ -133,7 +119,9 @@ void a_1(){
   h_W1 -> Write();
   h_W2 -> Write();
   h_S -> Write();
+  h_S_totalnumber ->  Write();
   h_X -> Write();
+  h_X_totalnumber -> Write();
   
   c = new TCanvas("canvas", "M_Higgs_S_X", 2000, 1000);
   c -> Divide (3,2);
@@ -155,6 +143,15 @@ void a_1(){
   
   c -> cd(6);
   h_X -> Draw();
+  
+  c1 = new TCanvas("canvas1", "M_S_X", 2000, 500);
+  c1 -> Divide (2,1);
+  
+  c1 -> cd(1);
+  h_S_totalnumber -> Draw();
+  
+  c1 -> cd(2);
+  h_X_totalnumber -> Draw();
   
   f.Close();
 } 
