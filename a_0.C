@@ -16,7 +16,7 @@
 #include "TLegend.h" 
 #include "TLorentzVector.h"
 
-//This code finds the large jet and (jet) b-tagged Higgs Boson mass
+//This code finds the large jet and (jet) b-tagged Higgs Boson mass using the bbww_x1000_s170 file
 
 void a_0(){
   gStyle -> SetOptStat("nemr");
@@ -26,6 +26,7 @@ void a_0(){
   auto h_Higgs = new TH1F("M_{inv} Higgs", "Invariant Mass of the Higgs Boson from large jet with b-tagging; Mass [MeV]", nbins, 0.0, 2.0e5);
   auto h_W = new TH1F("M_{inv} W", "Invariant Mass of W Boson from large jet; Mass [MeV]", nbins, 0.0, 3.0e5);
   auto h_X = new TH1F("M_{inv} X", "Invariant Mass of the X Particle from large jet Higgs and W; Mass [MeV]", nbins, 0.0, 2.0e6);
+  auto h_X_number = new TH1F("M_{inv} X number", "Invariant Mass of the X Particle from large jet Higgs and W; Mass [MeV]", nbins, 0.0, 2.0e6);
   
   auto file = TFile::Open("bbww_x1000_s170.root");
   TTree* ctree = (TTree*)file->Get("CollectionTree");
@@ -104,7 +105,7 @@ void a_0(){
 	  H.SetPtEtaPhiE(ljet_pt[j], ljet_eta[j], ljet_phi[j], ljet_e[j]);
 	  h_Higgs->Fill(H.M(), w);
 	}
-	else if (ljet.M() > 145e3 /*60e3 && ljet.M() < 100e3*/ && nbtag == 0) 
+	else if (ljet.M() > 145e3 && ljet.M() < 180e3 /*60e3 && ljet.M() < 100e3*/ && nbtag == 0) 
 	{
 	  S.SetPtEtaPhiE(ljet_pt[j], ljet_eta[j], ljet_phi[j], ljet_e[j]);
 	  h_W->Fill(S.M(), w);
@@ -113,6 +114,7 @@ void a_0(){
     }  
     X = H + S;
     h_X->Fill(X.M(), w);
+    if (X.M() > 850e3 && X.M() < 1050e3) h_X_number->Fill(X.M(), w); 
   } 
   
   file->Close();
@@ -121,6 +123,7 @@ void a_0(){
   h_Higgs -> Write();
   h_W -> Write();
   h_X -> Write();
+  h_X_number -> Write();
   
   c = new TCanvas("canvas", "M_Higgs_S_X", 2000, 1000);
   c -> Divide (2,2);
@@ -133,6 +136,9 @@ void a_0(){
   
   c -> cd(3);
   h_X -> Draw();
+  
+  c -> cd(4);
+  h_X_number -> Draw();
   
   f.Close();
 } 
