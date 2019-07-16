@@ -114,7 +114,7 @@ void a_2_x2000_s170(){
     }  
     X = H + S;
     h_X->Fill(X.M(), w);
-    if (X.M() > 1900e3 && X.M() < 2050e3) h_X_number->Fill(X.M(), w);
+    if (X.M() > 1850e3 && X.M() < 2100e3) h_X_number->Fill(X.M(), w);
   } 
   
   file->Close();

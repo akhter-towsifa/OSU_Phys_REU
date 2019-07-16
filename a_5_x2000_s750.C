@@ -107,7 +107,7 @@ void a_5_x2000_s750(){
     }  
     X = H + S;
     if (X.M() > 0) h_X->Fill(X.M(), w);
-    if (X.M() > 1900e3 && X.M() < 2050e3) h_X_totalnumber->Fill(X.M(), w);
+    if (X.M() > 1850e3 && X.M() < 2100e3) h_X_totalnumber->Fill(X.M(), w);
     
   } 
   

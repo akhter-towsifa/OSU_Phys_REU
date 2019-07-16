@@ -122,13 +122,13 @@ void a_1_other_x2000_s1500(){
 	  if (delta_r > 0.2)  h_Minv->Fill(jet.M(), w);
 	}
 	S = W1 + W2;
-	if (S.M() > 0) h_S->Fill(S.M(), w);
+	/*if (S.M() > 0)*/ h_S->Fill(S.M(), w);
 	if (S.M() > 1400e3 && S.M() < 1550e3) h_S_totalnumber->Fill(S.M(), w);
       }
     }  
     X = H + S;
-    if (X.M() > 0) h_X->Fill(X.M(), w);
-    if (X.M() > 1900e3 && X.M() < 2050e3) h_X_totalnumber->Fill(X.M(), w);
+    /*if (X.M() > 0) */h_X->Fill(X.M(), w);
+    if (X.M() > 1850e3 && X.M() < 2100e3) h_X_totalnumber->Fill(X.M(), w);
   } 
   
   file->Close();

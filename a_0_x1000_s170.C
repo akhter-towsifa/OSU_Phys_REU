@@ -105,7 +105,7 @@ void a_0_x1000_s170(){
 	  H.SetPtEtaPhiE(ljet_pt[j], ljet_eta[j], ljet_phi[j], ljet_e[j]);
 	  h_Higgs->Fill(H.M(), w);
 	}
-	else if (ljet.M() > 150e3 && ljet.M() < 200e3 && nbtag == 0) 
+	else if (ljet.M() > 145e3 && ljet.M() < 180e3 && nbtag == 0) 
 	{
 	  S.SetPtEtaPhiE(ljet_pt[j], ljet_eta[j], ljet_phi[j], ljet_e[j]);
 	  h_W->Fill(S.M(), w);
@@ -114,7 +114,7 @@ void a_0_x1000_s170(){
     }  
     X = H + S;
     h_X->Fill(X.M(), w);
-    if (X.M() > 700e3 && X.M() < 1200e3) h_X_number->Fill(X.M(), w); 
+    if (X.M() > 800e3 && X.M() < 1100e3) h_X_number->Fill(X.M(), w); 
   } 
   
   file->Close();
