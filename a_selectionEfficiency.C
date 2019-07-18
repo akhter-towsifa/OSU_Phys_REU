@@ -17,7 +17,7 @@
 #include "TLorentzVector.h"
 #include "TGraph.h"
  
-//This code is to find the selection efficiency for all the different mass point and all the boosted types (without taking regular jet b-tagging into account).
+//This code is to find the selection efficiency for all the different mass point and all the boosted types (both with and without taking regular jet b-tagging into account).
 
 void a_selectionEfficiency(){
   
@@ -70,20 +70,34 @@ void a_selectionEfficiency(){
   int nsel01 = 0;		//counting fully boosted events that are selected
   int nsel02 = 0;		//counting boosted events that are selected
   int nsel03 = 0;		//counting semi-boosted events that are selected
-  cout << "\nnentries0: " << nentries0 << endl;
+  
+  int nsel01b = 0;		//counting fully boosted events that are selected with b-tagging
+  int nsel02b = 0;		//counting boosted events that are selected with b-tagging
+  int nsel03b = 0;		//counting semi-boosted events that are selected with b-tagging
+  
+  cout << "\nnentries0: " << nentries0 << "\tX: 1000 GeV \tS: 170 Gev" << endl;
   for (int i=0; i<nentries0; i++)			//loops over all the 20,000 entries in file0
   {
     t0->GetEntry(i);
-    int count01 = 0;
-    int count02 = 0;
-    int count03 = 0;
+    int count01 = 0;		//counts the number of higgs within each Ljet
+    int count02 = 0;		//counts the number of WW Ljets
+    int count03 = 0;		//counts the number of W Ljets
+    int count04 = 0;		//counts the number of regular W jets
+    
+    int count01b = 0;		
+    int count02b = 0;
+    int count03b = 0;
+    int count04b = 0;
+    
     for (int i0=0; i0<n_ljet0; i0++)			//loops over all the large jets in each entry
     {
       TLorentzVector ljet;				//Defines a Lorentz vector "ljet" that stores the large jets in each iteration j over all large jets
       ljet.SetPtEtaPhiE(ljet_pt0[i0], ljet_eta0[i0], ljet_phi0[i0], ljet_e0[i0]);
       if (ljet.M()>105.0e3 && ljet.M()<145.0e3) count01++;
-      if (ljet.M()>145.0e3 && ljet.M()<200.0e3) count01++;
-      if (ljet.M()>60.0e3 && ljet.M()<100.0e3) count02++;
+      if (ljet.M()>145.0e3 && ljet.M()<200.0e3) count02++;
+      if (ljet.M()>60.0e3 && ljet.M()<100.0e3) count03++;
+      
+      int countb0 = 0;
       
       for (int i1=0; i1<n_jet0; i1++)			//loops over all the regular jets within each large jet
       {
@@ -91,16 +105,27 @@ void a_selectionEfficiency(){
 	jet.SetPtEtaPhiE(jet_pt0[i1], jet_eta0[i1], jet_phi0[i1], jet_e0[i1]);
 	float delta_r;
 	delta_r = jet.DeltaR(ljet);
-	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3) count03++;
+	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3) count04++;
+	if (jet_btagged0 > 0) countb0++;
+	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3 && countb0==0) count04b++;
       }
+      
+      if (ljet.M()>105.0e3 && ljet.M()<145.0e3 && countb0>=1) count01b++;
+      if (ljet.M()>145.0e3 && ljet.M()<200.0e3 && countb0==0) count02b++;
+      if (ljet.M()>60.0e3 && ljet.M()<100.0e3 && countb0==0) count03b++;
+      
     }
-    if (count01 > 0) nsel01++;
-    if (count01 > 0 && count02 > 0) nsel02++;
-    if (count01 > 0 && count02 > 0 && count03 > 0) nsel03++;
+    if (count01 > 0 && count02 > 0) nsel01++;
+    else if (count01 > 0 && count03 > 1) nsel02++;
+    else if (count01 > 0 && count03 > 0 && count04 > 0) nsel03++;
+
+    if (count01b > 0 && count02b > 0) nsel01b++;
+    else if (count01b > 0 && count03b > 1) nsel02b++;
+    else if (count01b > 0 && count03b > 0 && count04b > 0) nsel03b++;
   }
-  cout << "nsel01: " << nsel01 << endl;
-  cout << "nsel02: " << nsel02 << endl;
-  cout << "nsel03: " << nsel03 << endl;
+  cout << "nsel01: " << nsel01 << "\tnsel01b: " << nsel01b << endl;
+  cout << "nsel02: " << nsel02 << "\tnsel02b: " << nsel02b << endl;
+  cout << "nsel03: " << nsel03 << "\tnsel03b: " << nsel03b << endl;
   file0->Close();
 
   
@@ -151,20 +176,33 @@ void a_selectionEfficiency(){
   int nsel11 = 0;		//counting fully boosted events that are selected
   int nsel12 = 0;		//counting boosted events that are selected
   int nsel13 = 0;		//counting semi-boosted events that are selected
-  cout << "\nnentries1: " << nentries1 << endl;
+  
+  int nsel11b = 0;
+  int nsel12b = 0;
+  int nsel13b = 0;
+  
+  cout << "\nnentries1: " << nentries1 << "\tX: 2000 GeV \tS: 1500 Gev" << endl;
   for (int j=0; j<nentries1; j++)			//loops over all the 20,000 entries in file1
   {
     t1->GetEntry(j);
     int count11 = 0;
     int count12 = 0;
     int count13 = 0;
+    int count14 = 0;
+    
+    int count11b = 0;
+    int count12b = 0;
+    int count13b = 0;
+    
     for ( int j0=0; j0<n_ljet1; j0++)			//loops over all the large jets in each entry
     {
       TLorentzVector ljet;				//Defines a Lorentz vector "ljet" that stores the large jets in each iteration j over all large jets
       ljet.SetPtEtaPhiE(ljet_pt1[j0], ljet_eta1[j0], ljet_phi1[j0], ljet_e1[j0]);
       if (ljet.M()>105.0e3 && ljet.M()<145.0e3) count11++;
-      if (ljet.M()>145.0e3 && ljet.M()<200.0e3) count11++;
-      if (ljet.M()>60.0e3 && ljet.M()<100.0e3) count12++;
+      if (ljet.M()>145.0e3 && ljet.M()<200.0e3) count12++;
+      if (ljet.M()>60.0e3 && ljet.M()<100.0e3) count13++;
+      
+      int countb1 = 0; 
       
       for (int j1=0; j1<n_jet1; j1++)			//loops over all the regular jets within each large jet
       {
@@ -172,19 +210,32 @@ void a_selectionEfficiency(){
 	jet.SetPtEtaPhiE(jet_pt1[j1], jet_eta1[j1], jet_phi1[j1], jet_e1[j1]);
 	float delta_r;
 	delta_r = jet.DeltaR(ljet);
-	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3) count13++;
+	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3) count14++;
+	if (jet_btagged1 > 0) countb1++;
       }
+      if (ljet.M()>105.0e3 && ljet.M()<145.0e3 && countb1>=1) count11b++;
+      if (ljet.M()>145.0e3 && ljet.M()<200.0e3 && countb1==0) count12b++;
+      if (ljet.M()>60.0e3 && ljet.M()<100.0e3 && countb1==0) count13b++;
     }
-    if (count11 > 0) nsel11++;
-    if (count11 > 0 && count12 > 0) nsel12++;
-    if (count11 > 0 && count12 > 0 && count13 > 0) nsel13++;
+    if (count11 > 0 && count12 > 0) nsel11++;
+    else if (count11 > 0 && count13 > 1) nsel12++;
+    else if (count11 > 0 && count13 > 0 && count14 > 0) nsel13++;
+    
+    if (count11b > 0) nsel11b++;
+    if (count11b > 0 && count12b > 0) nsel12b++;
+    if (count11b > 0 && count12b > 0 && count13b > 0) nsel13b++;
   }
   float nsel_11 = nsel11;
   float nsel_12 = nsel12;
   float nsel_13 = nsel13;
-  cout << "nsel11: " << nsel_11 << endl;
-  cout << "nsel12: " << nsel_12 << endl;
-  cout << "nsel13: " << nsel_13 << endl;
+  
+  float nsel_11b = nsel11b;
+  float nsel_12b = nsel12b;
+  float nsel_13b = nsel13b;
+  
+  cout << "nsel11: " << nsel_11 << "\tnsel11b: " << nsel_11b << endl;
+  cout << "nsel12: " << nsel_12 << "\tnsel12b: " << nsel_12b << endl;
+  cout << "nsel13: " << nsel_13 << "\tnsel13b: " << nsel_13b << endl;
   
   smass[5] = 1500.0;
   fraction1[5] = nsel_11/nentries1;
@@ -245,20 +296,21 @@ void a_selectionEfficiency(){
   int nsel22 = 0;		//counting boosted events that are selected
   int nsel23 = 0;		//counting semi-boosted events that are selected
   
-  cout << "\nnentries2: " << nentries2 << endl;
+  cout << "\nnentries2: " << nentries2 << "\tX: 2000 GeV \tS: 170 Gev" << endl;
   for (int k=0; k<nentries2; k++)			//loops over all the 20,000 entries in file2
   {
     t2->GetEntry(k);
     int count21 = 0;
     int count22 = 0;
     int count23 = 0;
+    int count24 = 0;
     for ( int k0=0; k0<n_ljet2; k0++)			//loops over all the large jets in each entry
     {
       TLorentzVector ljet;				//Defines a Lorentz vector "ljet" that stores the large jets in each iteration j over all large jets
       ljet.SetPtEtaPhiE(ljet_pt2[k0], ljet_eta2[k0], ljet_phi2[k0], ljet_e2[k0]);
       if (ljet.M()>105.0e3 && ljet.M()<145.0e3) count21++;
-      if (ljet.M()>145.0e3 && ljet.M()<200.0e3) count21++;
-      if (ljet.M()>60.0e3 && ljet.M()<100.0e3) count22++;
+      if (ljet.M()>145.0e3 && ljet.M()<200.0e3) count22++;
+      if (ljet.M()>60.0e3 && ljet.M()<100.0e3) count23++;
       
       for (int k1=0; k1<n_jet2; k1++)			//loops over all the regular jets within each large jet
       {
@@ -266,12 +318,12 @@ void a_selectionEfficiency(){
 	jet.SetPtEtaPhiE(jet_pt2[k1], jet_eta2[k1], jet_phi2[k1], jet_e2[k1]);
 	float delta_r;
 	delta_r = jet.DeltaR(ljet);
-	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3) count23++;
+	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3) count24++;
       }
     }
-    if (count21 > 0) nsel21++;
-    if (count21 > 0 && count22 > 0) nsel22++;
-    if (count21 > 0 && count22 > 0 && count23 > 0) nsel23++;
+    if (count21 > 0 && count22 > 0) nsel21++;
+    else if (count21 > 0 && count23 > 1) nsel22++;
+    else if (count21 > 0 && count23 > 0 && count24 > 0) nsel23++;
   }
   float nsel_21 = nsel21;
   float nsel_22 = nsel22;
@@ -339,21 +391,22 @@ void a_selectionEfficiency(){
   int nsel32 = 0;		//counting boosted events that are selected
   int nsel33 = 0;		//counting semi-boosted events that are selected
   
-  cout << "\nnentries3: " << nentries3 << endl;
+  cout << "\nnentries3: " << nentries3 << "\tX: 2000 GeV \tS: 240 Gev" << endl;
   for (int l=0; l<nentries3; l++)			//loops over all the 20,000 entries in file3
   {
     t3->GetEntry(l);
     int count31 = 0;
     int count32 = 0;
     int count33 = 0;
+    int count34 = 0;
     
     for ( int l0=0; l0<n_ljet3; l0++)			//loops over all the large jets in each entry
     {
       TLorentzVector ljet;				//Defines a Lorentz vector "ljet" that stores the large jets in each iteration j over all large jets
       ljet.SetPtEtaPhiE(ljet_pt3[l0], ljet_eta3[l0], ljet_phi3[l0], ljet_e3[l0]);
       if (ljet.M()>105.0e3 && ljet.M()<145.0e3) count31++;
-      if (ljet.M()>145.0e3 && ljet.M()<200.0e3) count31++;
-      if (ljet.M()>60.0e3 && ljet.M()<100.0e3) count32++;
+      if (ljet.M()>145.0e3 && ljet.M()<200.0e3) count32++;
+      if (ljet.M()>60.0e3 && ljet.M()<100.0e3) count33++;
       
       for (int l1=0; l1<n_jet3; l1++)			//loops over all the regular jets within each large jet
       {
@@ -361,12 +414,12 @@ void a_selectionEfficiency(){
 	jet.SetPtEtaPhiE(jet_pt3[l1], jet_eta3[l1], jet_phi3[l1], jet_e3[l1]);
 	float delta_r;
 	delta_r = jet.DeltaR(ljet);
-	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3) count33++;
+	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3) count34++;
       }
     }
-    if (count31 > 0) nsel31++;
-    if (count31 > 0 && count32 > 0) nsel32++;
-    if (count31 > 0 && count32 > 0 && count33 > 0) nsel33++;
+    if (count31 > 0 && count32 > 0) nsel31++;
+    else if (count31 > 0 && count33 > 1) nsel32++;
+    else if (count31 > 0 && count33 > 0 && count34 > 0) nsel33++;
   }
   float nsel_31 = nsel31;
   float nsel_32 = nsel32;
@@ -434,20 +487,21 @@ void a_selectionEfficiency(){
   int nsel42 = 0;		//counting boosted events that are selected
   int nsel43 = 0;		//counting semi-boosted events that are selected
   
-  cout << "\nnentries4: " << nentries4 << endl;
+  cout << "\nnentries4: " << nentries4 << "\tX: 2000 GeV \tS: 400 Gev" << endl;
   for (int m=0; m<nentries4; m++)			//loops over all the 20,000 entries in file4
   {
     t4->GetEntry(m);
     int count41 = 0;
     int count42 = 0;
     int count43 = 0;
+    int count44 = 0;
     for ( int m0=0; m0<n_ljet4; m0++)			//loops over all the large jets in each entry
     {
       TLorentzVector ljet;				//Defines a Lorentz vector "ljet" that stores the large jets in each iteration j over all large jets
       ljet.SetPtEtaPhiE(ljet_pt4[m0], ljet_eta4[m0], ljet_phi4[m0], ljet_e4[m0]);
       if (ljet.M()>105.0e3 && ljet.M()<145.0e3) count41++;
-      if (ljet.M()>145.0e3 && ljet.M()<200.0e3) count41++;
-      if (ljet.M()>60.0e3 && ljet.M()<100.0e3) count42++;
+      if (ljet.M()>145.0e3 && ljet.M()<200.0e3) count42++;
+      if (ljet.M()>60.0e3 && ljet.M()<100.0e3) count43++;
       
       for (int m1=0; m1<n_jet4; m1++)			//loops over all the regular jets within each large jet
       {
@@ -455,12 +509,13 @@ void a_selectionEfficiency(){
 	jet.SetPtEtaPhiE(jet_pt4[m1], jet_eta4[m1], jet_phi4[m1], jet_e4[m1]);
 	float delta_r;
 	delta_r = jet.DeltaR(ljet);
-	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3) count43++;
+	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3) count44++;
       }
     }
-    if (count41 > 0) nsel41++;
-    if (count41 > 0 && count42 > 0) nsel42++;
-    if (count41 > 0 && count42 > 0 && count43 > 0) nsel43++;
+    
+    if (count41 > 0 && count42 > 0) nsel41++;
+    else if (count41 > 0 && count43 > 1) nsel42++;
+    else if (count41 > 0 && count43 > 0 && count44 > 0) nsel43++;
   }
   float nsel_41 = nsel41;
   float nsel_42 = nsel42;
@@ -528,20 +583,21 @@ void a_selectionEfficiency(){
   int nsel51 = 0;		//counting fully boosted events that are selected
   int nsel52 = 0;		//counting boosted events that are selected
   int nsel53 = 0;		//counting semi-boosted events that are selected
-  cout << "\nnentries5: " << nentries5 << endl;
+  cout << "\nnentries5: " << nentries5 << "\tX: 2000 GeV \tS: 750 Gev" << endl;
   for (int n=0; n<nentries5; n++)			//loops over all the 20,000 entries in file5
   {
     t5->GetEntry(n);
     int count51 = 0;
     int count52 = 0;
     int count53 = 0;
+    int count54 = 0;
     for ( int n0=0; n0<n_ljet5; n0++)			//loops over all the large jets in each entry
     {
       TLorentzVector ljet;				//Defines a Lorentz vector "ljet" that stores the large jets in each iteration j over all large jets
       ljet.SetPtEtaPhiE(ljet_pt5[n0], ljet_eta5[n0], ljet_phi5[n0], ljet_e5[n0]);
       if (ljet.M()>105.0e3 && ljet.M()<145.0e3) count51++;
-      if (ljet.M()>145.0e3 && ljet.M()<200.0e3) count51++;
-      if (ljet.M()>60.0e3 && ljet.M()<100.0e3) count52++;
+      if (ljet.M()>145.0e3 && ljet.M()<200.0e3) count52++;
+      if (ljet.M()>60.0e3 && ljet.M()<100.0e3) count53++;
       
       for (int n1=0; n1<n_jet5; n1++)			//loops over all the regular jets within each large jet
       {
@@ -549,12 +605,14 @@ void a_selectionEfficiency(){
 	jet.SetPtEtaPhiE(jet_pt5[n1], jet_eta5[n1], jet_phi5[n1], jet_e5[n1]);
 	float delta_r;
 	delta_r = jet.DeltaR(ljet);
-	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3) count53++;
+	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3) count54++;
       }
     }
-    if (count51 > 0) nsel51++;
-    if (count51 > 0 && count52 > 0) nsel52++;
-    if (count51 > 0 && count52 > 0 && count53 > 0) nsel53++;
+    
+    if (count51 > 0 && count52 > 0) nsel51++;
+    else if (count51 > 0 && count53 > 1) nsel52++;
+    else if (count51 > 0 && count53 > 0 && count54 > 0) nsel53++;
+    
   }
   float nsel_51 = nsel51;
   float nsel_52 = nsel52;
@@ -623,21 +681,22 @@ void a_selectionEfficiency(){
   int nsel62 = 0;		//counting boosted events that are selected
   int nsel63 = 0;		//counting semi-boosted events that are selected
   
-  cout << "\nnentries6: " << nentries6 << endl;
+  cout << "\nnentries6: " << nentries6 << "\tX: 2000 GeV \tS: 1000 Gev" << endl;
   for (int p=0; p<nentries6; p++)			//loops over all the 20,000 entries in file6
   {
     t6->GetEntry(p);
     int count61 = 0;
     int count62 = 0;
     int count63 = 0;
+    int count64 = 0;
     
     for ( int p0=0; p0<n_ljet6; p0++)			//loops over all the large jets in each entry
     {
       TLorentzVector ljet;				//Defines a Lorentz vector "ljet" that stores the large jets in each iteration j over all large jets
       ljet.SetPtEtaPhiE(ljet_pt6[p0], ljet_eta6[p0], ljet_phi6[p0], ljet_e6[p0]);
       if (ljet.M()>105.0e3 && ljet.M()<145.0e3) count61++;
-      if (ljet.M()>145.0e3 && ljet.M()<200.0e3) count61++;
-      if (ljet.M()>60.0e3 && ljet.M()<100.0e3) count62++;
+      if (ljet.M()>145.0e3 && ljet.M()<200.0e3) count62++;
+      if (ljet.M()>60.0e3 && ljet.M()<100.0e3) count63++;
       
       for (int p1=0; p1<n_jet0; p1++)			//loops over all the regular jets within each large jet
       {
@@ -645,12 +704,14 @@ void a_selectionEfficiency(){
 	jet.SetPtEtaPhiE(jet_pt6[p1], jet_eta6[p1], jet_phi6[p1], jet_e6[p1]);
 	float delta_r;
 	delta_r = jet.DeltaR(ljet);
-	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3) count63++;
+	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3) count64++;
       }
     }
-    if (count61 > 0) nsel61++;
-    if (count61 > 0 && count62 > 0) nsel62++;
-    if (count61 > 0 && count62 > 0 && count63 > 0) nsel63++;
+    
+    if (count61 > 0 && count62 > 0) nsel61++;
+    else if (count61 > 0 && count63 > 1) nsel62++;
+    else if (count61 > 0 && count63 > 0 && count64 > 0) nsel63++;
+    
   }
   float nsel_61 = nsel61;
   float nsel_62 = nsel62;
@@ -676,6 +737,7 @@ void a_selectionEfficiency(){
   TFile f("a_selectionEfficiency.root", "recreate");
 
   ca = new TCanvas("ca", "Event Selection Efficiency for different S mass points", 1000, 500);
+  ca -> Divide(1,1);
   
   ca -> cd(1);
   gr1 = new TGraph(6, smass, fraction1);
@@ -688,7 +750,7 @@ void a_selectionEfficiency(){
   gr1->SetMarkerColor(3);
   gr1->SetTitle("Event Selection Efficiency at different S mass points for M_{X} = 2 TeV (without b-tagging)");
   gr1->GetXaxis()->SetTitle("M_{S} [GeV]");
-  gr1->GetYaxis()->SetRangeUser(0.0, 1.1); 
+  gr1->GetYaxis()->SetRangeUser(0.0, 0.5); 
   gr1->GetYaxis()->SetTitle("Fraction of Events");
   
   gr2->SetLineColor(2);
