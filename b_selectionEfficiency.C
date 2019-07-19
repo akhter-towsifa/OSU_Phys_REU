@@ -20,9 +20,9 @@
 #include "TGraphErrors.h"
 
  
-//This code is to find the selection efficiency for all the different mass point and all the boosted types (without taking regular jet b-tagging into account).
+//This code is to find the selection efficiency for all the different mass point and all the boosted types (taking regular jet b-tagging into account).
 
-void a_selectionEfficiency(){
+void b_selectionEfficiency(){
   
   float smass[6], fraction1[6], fraction2[6], fraction3[6];	//smass list collects all the 6 S mass; fraction1,2,3 lists collect the nsel/nentries ratio at each of these mass points 
   float fraction1error[6], fraction2error[6], fraction3error[6];
@@ -43,6 +43,12 @@ void a_selectionEfficiency(){
   Float_t         ljet_eta0[8];   	//[n_ljet]
   Float_t         ljet_phi0[8];   	//[n_ljet]
   Float_t         ljet_e0[8];   	//[n_ljet]
+  Int_t           n_tjet0;
+  Float_t         tjet_pt0[28];   //[n_tjet]
+  Float_t         tjet_eta0[28];   //[n_tjet]
+  Float_t         tjet_phi0[28];   //[n_tjet]
+  Float_t         tjet_e0[28];   //[n_tjet]
+  Int_t           tjet_btagged0[28];   //[n_tjet]  
   
   t0->SetBranchAddress("n_jet", &n_jet0);
   t0->SetBranchAddress("jet_pt", jet_pt0);
@@ -55,6 +61,12 @@ void a_selectionEfficiency(){
   t0->SetBranchAddress("ljet_eta", ljet_eta0);
   t0->SetBranchAddress("ljet_phi", ljet_phi0);
   t0->SetBranchAddress("ljet_e", ljet_e0);
+  t0->SetBranchAddress("n_tjet", &n_tjet0);
+  t0->SetBranchAddress("tjet_pt", tjet_pt0);
+  t0->SetBranchAddress("tjet_eta", tjet_eta0);
+  t0->SetBranchAddress("tjet_phi", tjet_phi0);
+  t0->SetBranchAddress("tjet_e", tjet_e0);
+  t0->SetBranchAddress("tjet_btagged", tjet_btagged0);  
   
   t0->SetBranchStatus("*",0);
   
@@ -69,6 +81,12 @@ void a_selectionEfficiency(){
   t0->SetBranchStatus("ljet_eta", 1);
   t0->SetBranchStatus("ljet_phi", 1);
   t0->SetBranchStatus("ljet_e", 1);
+  t0->SetBranchStatus("n_tjet", 1);
+  t0->SetBranchStatus("tjet_pt", 1);
+  t0->SetBranchStatus("tjet_eta", 1);
+  t0->SetBranchStatus("tjet_phi", 1);
+  t0->SetBranchStatus("tjet_e", 1);
+  t0->SetBranchStatus("tjet_btagged", 1);
   
   int nentries0 = t0->GetEntries();
   int nsel01 = 0;		//counting fully boosted events that are selected
@@ -88,20 +106,28 @@ void a_selectionEfficiency(){
     {
       TLorentzVector ljet;				//Defines a Lorentz vector "ljet" that stores the large jets in each iteration j over all large jets
       ljet.SetPtEtaPhiE(ljet_pt0[i0], ljet_eta0[i0], ljet_phi0[i0], ljet_e0[i0]);
-      if (ljet.M()>105.0e3 && ljet.M()<145.0e3) count01++;
-      if (ljet.M()>160.0e3) count02++;
-      if (ljet.M()>60.0e3 && ljet.M()<100.0e3) count03++;
       
-      int countb0 = 0;
-      
+      int btag = 0;
       for (int i1=0; i1<n_jet0; i1++)			//loops over all the regular jets within each large jet
       {
 	TLorentzVector jet;
 	jet.SetPtEtaPhiE(jet_pt0[i1], jet_eta0[i1], jet_phi0[i1], jet_e0[i1]);
 	float delta_r;
 	delta_r = jet.DeltaR(ljet);
-	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3) count04++;
+	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3 && jet_btagged0[i1]==0) count04++;
+      	else if (delta_r < 0.2)
+	{
+	  for (int i2=0; i2<n_tjet0; i2++)
+	  {
+	    if (tjet_btagged0[i2] > 0) btag++;
+	  }
+	}
       }
+      
+      if (ljet.M()>105.0e3 && ljet.M()<145.0e3 && btag>0) count01++;
+      if (ljet.M()>145.0e3 && btag==0) count02++;
+      if (ljet.M()>60.0e3 && ljet.M()<100.0e3 && btag==0) count03++;
+      
     }
     if (count01 > 0 && count02 > 0) nsel01++;
     else if (count01 > 0 && count03 > 1) nsel02++;
@@ -130,6 +156,12 @@ void a_selectionEfficiency(){
   Float_t         ljet_eta1[9];   	//[n_ljet]
   Float_t         ljet_phi1[9];   	//[n_ljet]
   Float_t         ljet_e1[9];   	//[n_ljet]
+  Int_t           n_tjet1;
+  Float_t         tjet_pt1[27];   //[n_tjet]
+  Float_t         tjet_eta1[27];   //[n_tjet]
+  Float_t         tjet_phi1[27];   //[n_tjet]
+  Float_t         tjet_e1[27];   //[n_tjet]
+  Int_t           tjet_btagged1[27];   //[n_tjet]  
   
   t1->SetBranchAddress("n_jet", &n_jet1);
   t1->SetBranchAddress("jet_pt", jet_pt1);
@@ -142,6 +174,12 @@ void a_selectionEfficiency(){
   t1->SetBranchAddress("ljet_eta", ljet_eta1);
   t1->SetBranchAddress("ljet_phi", ljet_phi1);
   t1->SetBranchAddress("ljet_e", ljet_e1);
+  t1->SetBranchAddress("n_tjet", &n_tjet1);
+  t1->SetBranchAddress("tjet_pt", tjet_pt1);
+  t1->SetBranchAddress("tjet_eta", tjet_eta1);
+  t1->SetBranchAddress("tjet_phi", tjet_phi1);
+  t1->SetBranchAddress("tjet_e", tjet_e1);
+  t1->SetBranchAddress("tjet_btagged", tjet_btagged1);  
   
   t1->SetBranchStatus("*",0);
   
@@ -156,6 +194,12 @@ void a_selectionEfficiency(){
   t1->SetBranchStatus("ljet_eta", 1);
   t1->SetBranchStatus("ljet_phi", 1);
   t1->SetBranchStatus("ljet_e", 1);
+  t1->SetBranchStatus("n_tjet", 1);
+  t1->SetBranchStatus("tjet_pt", 1);
+  t1->SetBranchStatus("tjet_eta", 1);
+  t1->SetBranchStatus("tjet_phi", 1);
+  t1->SetBranchStatus("tjet_e", 1);
+  t1->SetBranchStatus("tjet_btagged", 1);
   
   int nentries1 = t1->GetEntries();
   int nsel11 = 0;		//counting fully boosted events that are selected
@@ -175,19 +219,26 @@ void a_selectionEfficiency(){
     {
       TLorentzVector ljet;				//Defines a Lorentz vector "ljet" that stores the large jets in each iteration j over all large jets
       ljet.SetPtEtaPhiE(ljet_pt1[j0], ljet_eta1[j0], ljet_phi1[j0], ljet_e1[j0]);
-      if (ljet.M()>105.0e3 && ljet.M()<145.0e3) count11++;
-      if (ljet.M()>145.0e3) count12++;
-      if (ljet.M()>60.0e3 && ljet.M()<100.0e3) count13++;
       
+      int btag = 0;
       for (int j1=0; j1<n_jet1; j1++)			//loops over all the regular jets within each large jet
       {
 	TLorentzVector jet;
 	jet.SetPtEtaPhiE(jet_pt1[j1], jet_eta1[j1], jet_phi1[j1], jet_e1[j1]);
 	float delta_r;
 	delta_r = jet.DeltaR(ljet);
-	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3) count14++;
+	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3 && jet_btagged1[j1]==0) count14++;
+	else if (delta_r < 0.2)
+	{
+	  for (int j2=0; j2<n_tjet1; j2++)
+	  {
+	    if (tjet_btagged1[j2] > 0) btag++;
+	  }
+	}
       }
-
+      if (ljet.M()>105.0e3 && ljet.M()<145.0e3 && btag>0) count11++;
+      if (ljet.M()>145.0e3 && btag==0) count12++;
+      if (ljet.M()>60.0e3 && ljet.M()<100.0e3 && btag==0) count13++;
     }
     if (count11 > 0 && count12 > 0) nsel11++;
     else if (count11 > 0 && count13 > 1) nsel12++;
@@ -233,6 +284,12 @@ void a_selectionEfficiency(){
   Float_t         ljet_eta2[9];   	//[n_ljet]
   Float_t         ljet_phi2[9];   	//[n_ljet]
   Float_t         ljet_e2[9];   	//[n_ljet]
+  Int_t           n_tjet2;
+  Float_t         tjet_pt2[26];   //[n_tjet]
+  Float_t         tjet_eta2[26];   //[n_tjet]
+  Float_t         tjet_phi2[26];   //[n_tjet]
+  Float_t         tjet_e2[26];   //[n_tjet]
+  Int_t           tjet_btagged2[26];   //[n_tjet]
   
   t2->SetBranchAddress("n_jet", &n_jet2);
   t2->SetBranchAddress("jet_pt", jet_pt2);
@@ -245,6 +302,12 @@ void a_selectionEfficiency(){
   t2->SetBranchAddress("ljet_eta", ljet_eta2);
   t2->SetBranchAddress("ljet_phi", ljet_phi2);
   t2->SetBranchAddress("ljet_e", ljet_e2);
+  t2->SetBranchAddress("n_tjet", &n_tjet2);
+  t2->SetBranchAddress("tjet_pt", tjet_pt2);
+  t2->SetBranchAddress("tjet_eta", tjet_eta2);
+  t2->SetBranchAddress("tjet_phi", tjet_phi2);
+  t2->SetBranchAddress("tjet_e", tjet_e2);
+  t2->SetBranchAddress("tjet_btagged", tjet_btagged2); 
   
   t2->SetBranchStatus("*",0);
   
@@ -259,6 +322,12 @@ void a_selectionEfficiency(){
   t2->SetBranchStatus("ljet_eta", 1);
   t2->SetBranchStatus("ljet_phi", 1);
   t2->SetBranchStatus("ljet_e", 1);
+  t2->SetBranchStatus("n_tjet", 1);
+  t2->SetBranchStatus("tjet_pt", 1);
+  t2->SetBranchStatus("tjet_eta", 1);
+  t2->SetBranchStatus("tjet_phi", 1);
+  t2->SetBranchStatus("tjet_e", 1);
+  t2->SetBranchStatus("tjet_btagged", 1);
   
   int nentries2 = t2->GetEntries();
   int nsel21 = 0;		//counting fully boosted events that are selected
@@ -277,17 +346,25 @@ void a_selectionEfficiency(){
     {
       TLorentzVector ljet;				//Defines a Lorentz vector "ljet" that stores the large jets in each iteration j over all large jets
       ljet.SetPtEtaPhiE(ljet_pt2[k0], ljet_eta2[k0], ljet_phi2[k0], ljet_e2[k0]);
-      if (ljet.M()>105.0e3 && ljet.M()<145.0e3) count21++;
-      if (ljet.M()>145.0e3) count22++;
-      if (ljet.M()>60.0e3 && ljet.M()<100.0e3) count23++;
       
+      int btag = 0;
       for (int k1=0; k1<n_jet2; k1++)			//loops over all the regular jets within each large jet
       {
 	TLorentzVector jet;
 	jet.SetPtEtaPhiE(jet_pt2[k1], jet_eta2[k1], jet_phi2[k1], jet_e2[k1]);
 	float delta_r;
 	delta_r = jet.DeltaR(ljet);
-	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3) count24++;
+	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3 && jet_btagged2[k1]==0) count24++;
+	else if (delta_r < 0.2)
+	{
+	  for (int k2=0; k2<n_tjet2; k2++)
+	  {
+	    if (tjet_btagged2[k2] > 0) btag++;
+	  }
+	}
+	if (ljet.M()>105.0e3 && ljet.M()<145.0e3 && btag > 0) count21++;
+	if (ljet.M()>145.0e3 && btag == 0) count22++;
+	if (ljet.M()>60.0e3 && ljet.M()<100.0e3 && btag == 0) count23++;
       }
     }
     if (count21 > 0 && count22 > 0) nsel21++;
@@ -297,7 +374,7 @@ void a_selectionEfficiency(){
   float nsel_21 = nsel21;
   float nsel_22 = nsel22;
   float nsel_23 = nsel23;
-  
+    
   cout << "nsel21: " << nsel_21 << endl;
   cout << "nsel22: " << nsel_22 << endl;
   cout << "nsel23: " << nsel_23 << endl;
@@ -316,7 +393,7 @@ void a_selectionEfficiency(){
   cout << fraction3[0] << endl;
   
   file2->Close();
-/////////////////////////////////////////////////
+//////////////////////////////////X 2000 S 240///////////////
   
   auto file3 = TFile::Open("bbww_x2000_s240.root");
   TTree* t3 = (TTree*)file3->Get("CollectionTree");
@@ -332,6 +409,12 @@ void a_selectionEfficiency(){
   Float_t         ljet_eta3[10];   	//[n_ljet]
   Float_t         ljet_phi3[10];   	//[n_ljet]
   Float_t         ljet_e3[10];   	//[n_ljet]
+  Int_t           n_tjet3;
+  Float_t         tjet_pt3[32];   //[n_tjet]
+  Float_t         tjet_eta3[32];   //[n_tjet]
+  Float_t         tjet_phi3[32];   //[n_tjet]
+  Float_t         tjet_e3[32];   //[n_tjet]
+  Int_t           tjet_btagged3[32];   //[n_tjet]
   
   t3->SetBranchAddress("n_jet", &n_jet3);
   t3->SetBranchAddress("jet_pt", jet_pt3);
@@ -344,6 +427,12 @@ void a_selectionEfficiency(){
   t3->SetBranchAddress("ljet_eta", ljet_eta3);
   t3->SetBranchAddress("ljet_phi", ljet_phi3);
   t3->SetBranchAddress("ljet_e", ljet_e3);
+  t3->SetBranchAddress("n_tjet", &n_tjet3);
+  t3->SetBranchAddress("tjet_pt", tjet_pt3);
+  t3->SetBranchAddress("tjet_eta", tjet_eta3);
+  t3->SetBranchAddress("tjet_phi", tjet_phi3);
+  t3->SetBranchAddress("tjet_e", tjet_e3);
+  t3->SetBranchAddress("tjet_btagged", tjet_btagged3);
   
   t3->SetBranchStatus("*",0);
   
@@ -358,6 +447,12 @@ void a_selectionEfficiency(){
   t3->SetBranchStatus("ljet_eta", 1);
   t3->SetBranchStatus("ljet_phi", 1);
   t3->SetBranchStatus("ljet_e", 1);
+  t3->SetBranchStatus("n_tjet", 1);
+  t3->SetBranchStatus("tjet_pt", 1);
+  t3->SetBranchStatus("tjet_eta", 1);
+  t3->SetBranchStatus("tjet_phi", 1);
+  t3->SetBranchStatus("tjet_e", 1);
+  t3->SetBranchStatus("tjet_btagged", 1);
   
   int nentries3 = t3->GetEntries();
   int nsel31 = 0;		//counting fully boosted events that are selected
@@ -377,10 +472,8 @@ void a_selectionEfficiency(){
     {
       TLorentzVector ljet;				//Defines a Lorentz vector "ljet" that stores the large jets in each iteration j over all large jets
       ljet.SetPtEtaPhiE(ljet_pt3[l0], ljet_eta3[l0], ljet_phi3[l0], ljet_e3[l0]);
-      if (ljet.M()>105.0e3 && ljet.M()<145.0e3) count31++;
-      if (ljet.M()>145.0e3) count32++;
-      if (ljet.M()>60.0e3 && ljet.M()<100.0e3) count33++;
       
+      int btag = 0;
       for (int l1=0; l1<n_jet3; l1++)			//loops over all the regular jets within each large jet
       {
 	TLorentzVector jet;
@@ -388,7 +481,17 @@ void a_selectionEfficiency(){
 	float delta_r;
 	delta_r = jet.DeltaR(ljet);
 	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3) count34++;
+	else if (delta_r < 0.2)
+	{
+	  for (int l2=0; l2<n_tjet3; l2++)
+	  {
+	    if (tjet_btagged3[l2] > 0) btag++;
+	  }
+	}
       }
+      if (ljet.M()>105.0e3 && ljet.M()<145.0e3 && btag>0) count31++;
+      if (ljet.M()>145.0e3 && btag==0) count32++;
+      if (ljet.M()>60.0e3 && ljet.M()<100.0e3 && btag==0) count33++;
     }
     if (count31 > 0 && count32 > 0) nsel31++;
     else if (count31 > 0 && count33 > 1) nsel32++;
@@ -432,6 +535,12 @@ void a_selectionEfficiency(){
   Float_t         ljet_eta4[10];   	//[n_ljet]
   Float_t         ljet_phi4[10];   	//[n_ljet]
   Float_t         ljet_e4[10];   		//[n_ljet]
+  Int_t           n_tjet4;
+  Float_t         tjet_pt4[26];   //[n_tjet]
+  Float_t         tjet_eta4[26];   //[n_tjet]
+  Float_t         tjet_phi4[26];   //[n_tjet]
+  Float_t         tjet_e4[26];   //[n_tjet]
+  Int_t           tjet_btagged4[26];   //[n_tjet]
   
   t4->SetBranchAddress("n_jet", &n_jet4);
   t4->SetBranchAddress("jet_pt", jet_pt4);
@@ -444,6 +553,12 @@ void a_selectionEfficiency(){
   t4->SetBranchAddress("ljet_eta", ljet_eta4);
   t4->SetBranchAddress("ljet_phi", ljet_phi4);
   t4->SetBranchAddress("ljet_e", ljet_e4);
+  t4->SetBranchAddress("n_tjet", &n_tjet4);
+  t4->SetBranchAddress("tjet_pt", tjet_pt4);
+  t4->SetBranchAddress("tjet_eta", tjet_eta4);
+  t4->SetBranchAddress("tjet_phi", tjet_phi4);
+  t4->SetBranchAddress("tjet_e", tjet_e4);
+  t4->SetBranchAddress("tjet_btagged", tjet_btagged4);
   
   t4->SetBranchStatus("*",0);
   
@@ -458,6 +573,12 @@ void a_selectionEfficiency(){
   t4->SetBranchStatus("ljet_eta", 1);
   t4->SetBranchStatus("ljet_phi", 1);
   t4->SetBranchStatus("ljet_e", 1);
+  t4->SetBranchStatus("n_tjet", 1);
+  t4->SetBranchStatus("tjet_pt", 1);
+  t4->SetBranchStatus("tjet_eta", 1);
+  t4->SetBranchStatus("tjet_phi", 1);
+  t4->SetBranchStatus("tjet_e", 1);
+  t4->SetBranchStatus("tjet_btagged", 1);
   
   int nentries4 = t4->GetEntries();
   int nsel41 = 0;		//counting fully boosted events that are selected
@@ -476,10 +597,8 @@ void a_selectionEfficiency(){
     {
       TLorentzVector ljet;				//Defines a Lorentz vector "ljet" that stores the large jets in each iteration j over all large jets
       ljet.SetPtEtaPhiE(ljet_pt4[m0], ljet_eta4[m0], ljet_phi4[m0], ljet_e4[m0]);
-      if (ljet.M()>105.0e3 && ljet.M()<145.0e3) count41++;
-      if (ljet.M()>145.0e3) count42++;
-      if (ljet.M()>60.0e3 && ljet.M()<100.0e3) count43++;
-      
+
+      int btag = 0;
       for (int m1=0; m1<n_jet4; m1++)			//loops over all the regular jets within each large jet
       {
 	TLorentzVector jet;
@@ -487,7 +606,17 @@ void a_selectionEfficiency(){
 	float delta_r;
 	delta_r = jet.DeltaR(ljet);
 	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3) count44++;
+	else if (delta_r < 0.2)
+	{
+	  for (int m2=0; m2<n_tjet4; m2++)
+	  {
+	    if (tjet_btagged4[m2] > 0) btag++;
+	  }
+	}
       }
+      if (ljet.M()>105.0e3 && ljet.M()<145.0e3 &&  btag>0) count41++;
+      if (ljet.M()>145.0e3 && btag==0) count42++;
+      if (ljet.M()>60.0e3 && ljet.M()<100.0e3 && btag==0) count43++;      
     }
     
     if (count41 > 0 && count42 > 0) nsel41++;
@@ -533,6 +662,12 @@ void a_selectionEfficiency(){
   Float_t         ljet_eta5[10];   	//[n_ljet]
   Float_t         ljet_phi5[10];   	//[n_ljet]
   Float_t         ljet_e5[10];   		//[n_ljet]
+  Int_t           n_tjet5;
+  Float_t         tjet_pt5[28];   //[n_tjet]
+  Float_t         tjet_eta5[28];   //[n_tjet]
+  Float_t         tjet_phi5[28];   //[n_tjet]
+  Float_t         tjet_e5[28];   //[n_tjet]
+  Int_t           tjet_btagged5[28];   //[n_tjet]
   
   t5->SetBranchAddress("n_jet", &n_jet5);
   t5->SetBranchAddress("jet_pt", jet_pt5);
@@ -545,6 +680,12 @@ void a_selectionEfficiency(){
   t5->SetBranchAddress("ljet_eta", ljet_eta5);
   t5->SetBranchAddress("ljet_phi", ljet_phi5);
   t5->SetBranchAddress("ljet_e", ljet_e5);
+  t5->SetBranchAddress("n_tjet", &n_tjet5);
+  t5->SetBranchAddress("tjet_pt", tjet_pt5);
+  t5->SetBranchAddress("tjet_eta", tjet_eta5);
+  t5->SetBranchAddress("tjet_phi", tjet_phi5);
+  t5->SetBranchAddress("tjet_e", tjet_e5);
+  t5->SetBranchAddress("tjet_btagged", tjet_btagged5);
   
   t5->SetBranchStatus("*",0);
   
@@ -559,6 +700,12 @@ void a_selectionEfficiency(){
   t5->SetBranchStatus("ljet_eta", 1);
   t5->SetBranchStatus("ljet_phi", 1);
   t5->SetBranchStatus("ljet_e", 1);
+  t5->SetBranchStatus("n_tjet", 1);
+  t5->SetBranchStatus("tjet_pt", 1);
+  t5->SetBranchStatus("tjet_eta", 1);
+  t5->SetBranchStatus("tjet_phi", 1);
+  t5->SetBranchStatus("tjet_e", 1);
+  t5->SetBranchStatus("tjet_btagged", 1);
   
   int nentries5 = t5->GetEntries();
   int nsel51 = 0;		//counting fully boosted events that are selected
@@ -576,10 +723,8 @@ void a_selectionEfficiency(){
     {
       TLorentzVector ljet;				//Defines a Lorentz vector "ljet" that stores the large jets in each iteration j over all large jets
       ljet.SetPtEtaPhiE(ljet_pt5[n0], ljet_eta5[n0], ljet_phi5[n0], ljet_e5[n0]);
-      if (ljet.M()>105.0e3 && ljet.M()<145.0e3) count51++;
-      if (ljet.M()>145.0e3) count52++;
-      if (ljet.M()>60.0e3 && ljet.M()<100.0e3) count53++;
-      
+
+      int btag = 0;
       for (int n1=0; n1<n_jet5; n1++)			//loops over all the regular jets within each large jet
       {
 	TLorentzVector jet;
@@ -587,7 +732,17 @@ void a_selectionEfficiency(){
 	float delta_r;
 	delta_r = jet.DeltaR(ljet);
 	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3) count54++;
+	else if (delta_r < 0.2)
+	{
+	  for (int n2=0; n2<n_tjet5; n2++)
+	  {
+	    if (tjet_btagged5[n2] > 0) btag++;
+	  }
+	}
       }
+      if (ljet.M()>105.0e3 && ljet.M()<145.0e3 && btag==0) count51++;
+      if (ljet.M()>145.0e3 && btag>0) count52++;
+      if (ljet.M()>60.0e3 && ljet.M()<100.0e3 && btag>0) count53++;
     }
     
     if (count51 > 0 && count52 > 0) nsel51++;
@@ -634,6 +789,12 @@ void a_selectionEfficiency(){
   Float_t         ljet_eta6[9];   	//[n_ljet]
   Float_t         ljet_phi6[9];   	//[n_ljet]
   Float_t         ljet_e6[9];   	//[n_ljet]
+  Int_t           n_tjet6;
+  Float_t         tjet_pt6[27];   //[n_tjet]
+  Float_t         tjet_eta6[27];   //[n_tjet]
+  Float_t         tjet_phi6[27];   //[n_tjet]
+  Float_t         tjet_e6[27];   //[n_tjet]
+  Int_t           tjet_btagged6[27];   //[n_tjet]  
   
   t6->SetBranchAddress("n_jet", &n_jet6);
   t6->SetBranchAddress("jet_pt", jet_pt6);
@@ -646,6 +807,12 @@ void a_selectionEfficiency(){
   t6->SetBranchAddress("ljet_eta", ljet_eta6);
   t6->SetBranchAddress("ljet_phi", ljet_phi6);
   t6->SetBranchAddress("ljet_e", ljet_e6);
+  t6->SetBranchAddress("n_tjet", &n_tjet6);
+  t6->SetBranchAddress("tjet_pt", tjet_pt6);
+  t6->SetBranchAddress("tjet_eta", tjet_eta6);
+  t6->SetBranchAddress("tjet_phi", tjet_phi6);
+  t6->SetBranchAddress("tjet_e", tjet_e6);
+  t6->SetBranchAddress("tjet_btagged", tjet_btagged6);
   
   t6->SetBranchStatus("*",0);
   
@@ -660,6 +827,12 @@ void a_selectionEfficiency(){
   t6->SetBranchStatus("ljet_eta", 1);
   t6->SetBranchStatus("ljet_phi", 1);
   t6->SetBranchStatus("ljet_e", 1);
+  t6->SetBranchStatus("n_tjet", 1);
+  t6->SetBranchStatus("tjet_pt", 1);
+  t6->SetBranchStatus("tjet_eta", 1);
+  t6->SetBranchStatus("tjet_phi", 1);
+  t6->SetBranchStatus("tjet_e", 1);
+  t6->SetBranchStatus("tjet_btagged", 1);
   
   int nentries6 = t6->GetEntries();
   int nsel61 = 0;		//counting fully boosted events that are selected
@@ -679,10 +852,8 @@ void a_selectionEfficiency(){
     {
       TLorentzVector ljet;				//Defines a Lorentz vector "ljet" that stores the large jets in each iteration j over all large jets
       ljet.SetPtEtaPhiE(ljet_pt6[p0], ljet_eta6[p0], ljet_phi6[p0], ljet_e6[p0]);
-      if (ljet.M()>105.0e3 && ljet.M()<145.0e3) count61++;
-      if (ljet.M()>145.0e3) count62++;
-      if (ljet.M()>60.0e3 && ljet.M()<100.0e3) count63++;
-      
+
+      int btag = 0;
       for (int p1=0; p1<n_jet0; p1++)			//loops over all the regular jets within each large jet
       {
 	TLorentzVector jet;
@@ -690,7 +861,17 @@ void a_selectionEfficiency(){
 	float delta_r;
 	delta_r = jet.DeltaR(ljet);
 	if (delta_r > 0.2 && jet.M()>60.0e3 && jet.M()<100.0e3) count64++;
+	else if (delta_r < 0.2)
+	{
+	  for (int p2=0; p2<n_tjet6; p2++)
+	  {
+	    if (tjet_btagged6[p2] > 0) btag++;
+	  }
+	}
       }
+      if (ljet.M()>105.0e3 && ljet.M()<145.0e3 && btag>0) count61++;
+      if (ljet.M()>145.0e3 && btag==0) count62++;
+      if (ljet.M()>60.0e3 && ljet.M()<100.0e3 && btag==0) count63++;
     }
     
     if (count61 > 0 && count62 > 0) nsel61++;
@@ -723,7 +904,7 @@ void a_selectionEfficiency(){
  
 /////////////////////////////////////////////////////////////////////////////////
   
-  TFile f("a_selectionEfficiency.root", "recreate");
+  TFile f("b_selectionEfficiency.root", "recreate");
 
   ca = new TCanvas("ca", "Event Selection Efficiency for different S mass points", 1000, 500);
   ca -> Divide(1,1);
@@ -739,9 +920,9 @@ void a_selectionEfficiency(){
   gr1->SetLineWidth(2);
   gr1->SetMarkerStyle(2);
   gr1->SetMarkerColor(3);
-  gr1->SetTitle("Event Selection Efficiency at different S mass points for M_{X} = 2 TeV (without b-tagging)");
+  gr1->SetTitle("Event Selection Efficiency at different S mass points for M_{X} = 2 TeV (with b-tagging)");
   gr1->GetXaxis()->SetTitle("M_{S} [GeV]");
-  gr1->GetYaxis()->SetRangeUser(0.0, 0.5); 
+  gr1->GetYaxis()->SetRangeUser(0.0, 0.3); 
   gr1->GetYaxis()->SetTitle("Fraction of Events");
   
   gr2->SetLineColor(2);
@@ -765,4 +946,5 @@ void a_selectionEfficiency(){
   legend->Draw();
   
   f.Close();
+  
 }
