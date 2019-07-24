@@ -22,10 +22,15 @@
  
 //This code is to find the selection efficiency for all the different mass point and all the boosted types (taking regular jet b-tagging into account).
 
-void b_selectionEfficiency(){
+void b_selectionEfficiency_3btags(){
   
-  float smass[6], fraction1[6], fraction2[6], fraction3[6];	//smass list collects all the 6 S mass; fraction1,2,3 lists collect the nsel/nentries ratio at each of these mass points 
-  float fraction1error[6], fraction2error[6], fraction3error[6];
+  float smass[6];	//smass list collects all the 6 S mass; fraction1,2,3 lists collect the nsel/nentries ratio at each of these mass points 
+  float fraction1a[6], fraction2a[6], fraction3a[6];
+  float fraction1b[6], fraction2b[6], fraction3b[6];
+  float fraction1c[6], fraction2c[6], fraction3c[6];
+  float fraction1aerror[6], fraction2aerror[6], fraction3aerror[6];
+  float fraction1berror[6], fraction2berror[6], fraction3berror[6];
+  float fraction1cerror[6], fraction2cerror[6], fraction3cerror[6];
   
 ////////////////////////////////X 1000 S 170 //////////////////////////////////
   
@@ -89,15 +94,23 @@ void b_selectionEfficiency(){
   t0->SetBranchStatus("tjet_btagged", 1);
   
   int nentries0 = t0->GetEntries();
-  int nsel01 = 0;		//counting fully boosted events that are selected
-  int nsel02 = 0;		//counting boosted events that are selected
-  int nsel03 = 0;		//counting semi-boosted events that are selected
+  int nsel01a = 0;		//counting fully boosted events that are selected
+  int nsel01b = 0;
+  int nsel01c = 0;
+  int nsel02a = 0;		//counting boosted events that are selected
+  int nsel02b = 0;
+  int nsel02c = 0;
+  int nsel03a = 0;		//counting semi-boosted events that are selected
+  int nsel03b = 0;
+  int nsel03c = 0;
   
   cout << "\nnentries0: " << nentries0 << "\tX: 1000 GeV \tS: 170 Gev" << endl;
   for (int i=0; i<nentries0; i++)			//loops over all the 20,000 entries in file0
   {
     t0->GetEntry(i);
-    int count01 = 0;		//counts the number of higgs within each Ljet
+    int count01a = 0;		//counts the number of higgs within each Ljet
+    int count01b = 0;
+    int count01c = 0;
     int count02 = 0;		//counts the number of WW Ljets
     int count03 = 0;		//counts the number of W Ljets
     int count04 = 0;		//counts the number of regular W jets
@@ -124,19 +137,32 @@ void b_selectionEfficiency(){
 	delta_r = tjet.DeltaR(ljet);
 	if (delta_r<0.2 && tjet_btagged0[i2] > 0) btag++;
       }
-      if (ljet.M()>105.0e3 && ljet.M()<145.0e3 && btag>1) count01++;
+
+      if (ljet.M()>105.0e3 && ljet.M()<145.0e3) 
+      {
+	if (btag == 0) count01a++;
+	else if (btag == 1) count01b++;
+	else count01c++;
+      }
       if (ljet.M()>145.0e3 && btag==0) count02++;
       if (ljet.M()>60.0e3 && ljet.M()<100.0e3 && btag==0) count03++;
       
     }
-    if (count01 > 0 && count02 > 0) nsel01++;
-    else if (count01 > 0 && count03 > 1) nsel02++;
-    else if (count01 > 0 && count03 > 0 && count04 > 0) nsel03++;
+    if (count01a > 0 && count02 > 0) nsel01a++;
+    else if (count01a > 0 && count03 > 1) nsel02a++;
+    else if (count01a > 0 && count03 > 0 && count04 > 0) nsel03a++;
 
+    if (count01b > 0 && count02 > 0) nsel01b++;
+    else if (count01b > 0 && count03 > 1) nsel02b++;
+    else if (count01b > 0 && count03 > 0 && count04 > 0) nsel03b++;
+    
+    if (count01c > 0 && count02 > 0) nsel01c++;
+    else if (count01c > 0 && count03 > 1) nsel02c++;
+    else if (count01c > 0 && count03 > 0 && count04 > 0) nsel03c++;
   }
-  cout << "nsel01: " << nsel01 << endl;
-  cout << "nsel02: " << nsel02 << endl;
-  cout << "nsel03: " << nsel03 << endl;
+  cout << "nsel01: " << nsel01a << "\t" << nsel01b << "\t" << nsel01c << endl;
+  cout << "nsel02: " << nsel02a << "\t" << nsel02b << "\t" << nsel02c << endl;
+  cout << "nsel03: " << nsel03a << "\t" << nsel03b << "\t" << nsel03c << endl;
   file0->Close();
 
   
@@ -202,15 +228,23 @@ void b_selectionEfficiency(){
   t1->SetBranchStatus("tjet_btagged", 1);
   
   int nentries1 = t1->GetEntries();
-  int nsel11 = 0;		//counting fully boosted events that are selected
-  int nsel12 = 0;		//counting boosted events that are selected
-  int nsel13 = 0;		//counting semi-boosted events that are selected
+  int nsel11a = 0;		//counting fully boosted events that are selected
+  int nsel11b = 0;
+  int nsel11c = 0;
+  int nsel12a = 0;		//counting boosted events that are selected
+  int nsel12b = 0;
+  int nsel12c = 0;
+  int nsel13a = 0;		//counting semi-boosted events that are selected
+  int nsel13b = 0;
+  int nsel13c = 0;
   
   cout << "\nnentries1: " << nentries1 << "\tX: 2000 GeV \tS: 1500 Gev" << endl;
   for (int j=0; j<nentries1; j++)			//loops over all the 20,000 entries in file1
   {
     t1->GetEntry(j);
-    int count11 = 0;
+    int count11a = 0;
+    int count11b = 0;
+    int count11c = 0;
     int count12 = 0;
     int count13 = 0;
     int count14 = 0;
@@ -236,36 +270,71 @@ void b_selectionEfficiency(){
 	float delta_r;
 	delta_r = tjet.DeltaR(ljet);
 	if (delta_r<0.2 && tjet_btagged1[j2] > 0) btag++;
+      }      
+      if (ljet.M()>105.0e3 && ljet.M()<145.0e3)
+      {
+	if (btag == 0) count11a++;
+	else if (btag == 1) count11b++;
+	else count11c++;
       }
-      if (ljet.M()>105.0e3 && ljet.M()<145.0e3 && btag>1) count11++;
       if (ljet.M()>145.0e3 && btag==0) count12++;
       if (ljet.M()>60.0e3 && ljet.M()<100.0e3 && btag==0) count13++;
     }
-    if (count11 > 0 && count12 > 0) nsel11++;
-    else if (count11 > 0 && count13 > 1) nsel12++;
-    else if (count11 > 0 && count13 > 0 && count14 > 0) nsel13++;
+    if (count11a > 0 && count12 > 0) nsel11a++;
+    else if (count11a > 0 && count13 > 1) nsel12a++;
+    else if (count11a > 0 && count13 > 0 && count14 > 0) nsel13a++;
+    
+    if (count11b > 0 && count12 > 0) nsel11b++;
+    else if (count11b > 0 && count13 > 1) nsel12b++;
+    else if (count11b > 0 && count13 > 0 && count14 > 0) nsel13b++;
+    
+    if (count11c > 0 && count12 > 0) nsel11c++;
+    else if (count11c > 0 && count13 > 1) nsel12c++;
+    else if (count11c > 0 && count13 > 0 && count14 > 0) nsel13c++;
 
   }
-  float nsel_11 = nsel11;
-  float nsel_12 = nsel12;
-  float nsel_13 = nsel13;
+  float nsel_11a = nsel11a;
+  float nsel_11b = nsel11b;
+  float nsel_11c = nsel11c;
+  float nsel_12a = nsel12a;
+  float nsel_12b = nsel12b;
+  float nsel_12c = nsel12c;
+  float nsel_13a = nsel13a;
+  float nsel_13b = nsel13b;
+  float nsel_13c = nsel13c;
   
-  cout << "nsel11: " << nsel_11 << endl;
-  cout << "nsel12: " << nsel_12 << endl;
-  cout << "nsel13: " << nsel_13 << endl;
+  cout << "nsel11: " << nsel_11a << "\t" << nsel_11b << "\t" << nsel_11c << endl;
+  cout << "nsel12: " << nsel_12a << "\t" << nsel_12b << "\t" << nsel_12c << endl;
+  cout << "nsel13: " << nsel_13a << "\t" << nsel_13b << "\t" << nsel_13c << endl;
   
   smass[5] = 1500.0;
-  fraction1[5] = nsel_11/nentries1;
-  fraction2[5] = nsel_12/nentries1;
-  fraction3[5] = nsel_13/nentries1;
+  fraction1a[5] = nsel_11a/nentries1;
+  fraction2a[5] = nsel_12a/nentries1;
+  fraction3a[5] = nsel_13a/nentries1;
   
-  fraction1error[5] = sqrt(fraction1[5] * (1-fraction1[5])) / sqrt(nentries1);
-  fraction2error[5] = sqrt(fraction2[5] * (1-fraction2[5])) / sqrt(nentries1);
-  fraction3error[5] = sqrt(fraction3[5] * (1-fraction3[5])) / sqrt(nentries1);
+  fraction1b[5] = nsel_11b/nentries1;
+  fraction2b[5] = nsel_12b/nentries1;
+  fraction3b[5] = nsel_13b/nentries1;
   
-  cout << fraction1[5] << endl;
-  cout << fraction2[5] << endl;
-  cout << fraction3[5] << endl;
+  fraction1c[5] = nsel_11c/nentries1;
+  fraction2c[5] = nsel_12c/nentries1;
+  fraction3c[5] = nsel_13c/nentries1;
+  
+  fraction1aerror[5] = sqrt(fraction1a[5] * (1-fraction1a[5])) / sqrt(nentries1);
+  fraction2aerror[5] = sqrt(fraction2a[5] * (1-fraction2a[5])) / sqrt(nentries1);
+  fraction3aerror[5] = sqrt(fraction3a[5] * (1-fraction3a[5])) / sqrt(nentries1);
+  
+  fraction1berror[5] = sqrt(fraction1b[5] * (1-fraction1b[5])) / sqrt(nentries1);
+  fraction2berror[5] = sqrt(fraction2b[5] * (1-fraction2b[5])) / sqrt(nentries1);
+  fraction3berror[5] = sqrt(fraction3b[5] * (1-fraction3b[5])) / sqrt(nentries1);
+  
+  fraction1cerror[5] = sqrt(fraction1c[5] * (1-fraction1c[5])) / sqrt(nentries1);
+  fraction2cerror[5] = sqrt(fraction2c[5] * (1-fraction2c[5])) / sqrt(nentries1);
+  fraction3cerror[5] = sqrt(fraction3c[5] * (1-fraction3c[5])) / sqrt(nentries1);
+  
+  cout << fraction1a[5] << "\t" << fraction1b[5] << "\t" << fraction1c[5] << endl;
+  cout << fraction2a[5] << "\t" << fraction2b[5] << "\t" << fraction1c[5] << endl;
+  cout << fraction3a[5] << "\t" << fraction3b[5] << "\t" << fraction3c[5]<< endl;
   
   file1->Close();
 
@@ -331,15 +400,23 @@ void b_selectionEfficiency(){
   t2->SetBranchStatus("tjet_btagged", 1);
   
   int nentries2 = t2->GetEntries();
-  int nsel21 = 0;		//counting fully boosted events that are selected
-  int nsel22 = 0;		//counting boosted events that are selected
-  int nsel23 = 0;		//counting semi-boosted events that are selected
+  int nsel21a = 0;		//counting fully boosted events that are selected
+  int nsel21b = 0;
+  int nsel21c = 0;
+  int nsel22a = 0;		//counting boosted events that are selected
+  int nsel22b = 0;
+  int nsel22c = 0;
+  int nsel23a = 0;		//counting semi-boosted events that are selected
+  int nsel23b = 0;
+  int nsel23c = 0;
   
   cout << "\nnentries2: " << nentries2 << "\tX: 2000 GeV \tS: 170 Gev" << endl;
   for (int k=0; k<nentries2; k++)			//loops over all the 20,000 entries in file2
   {
     t2->GetEntry(k);
-    int count21 = 0;
+    int count21a = 0;
+    int count21b = 0;
+    int count21c = 0;
     int count22 = 0;
     int count23 = 0;
     int count24 = 0;
@@ -364,35 +441,72 @@ void b_selectionEfficiency(){
 	float delta_r;
 	delta_r = tjet.DeltaR(ljet);
 	if (delta_r<0.2 && tjet_btagged2[k2] > 0) btag++;
-      }   
-      if (ljet.M()>105.0e3 && ljet.M()<145.0e3 && btag > 1) count21++;
+      }      
+      if (ljet.M()>105.0e3 && ljet.M()<145.0e3)
+      {
+	if (btag == 0) count21a++;
+	else if (btag == 1) count21b++;
+	else count21c++;
+      }
       if (ljet.M()>145.0e3 && btag == 0) count22++;
       if (ljet.M()>60.0e3 && ljet.M()<100.0e3 && btag == 0) count23++;
     }
-    if (count21 > 0 && count22 > 0) nsel21++;
-    else if (count21 > 0 && count23 > 1) nsel22++;
-    else if (count21 > 0 && count23 > 0 && count24 > 0) nsel23++;
-  }
-  float nsel_21 = nsel21;
-  float nsel_22 = nsel22;
-  float nsel_23 = nsel23;
+    if (count21a > 0 && count22 > 0) nsel21a++;
+    else if (count21a > 0 && count23 > 1) nsel22a++;
+    else if (count21a > 0 && count23 > 0 && count24 > 0) nsel23a++;
     
-  cout << "nsel21: " << nsel_21 << endl;
-  cout << "nsel22: " << nsel_22 << endl;
-  cout << "nsel23: " << nsel_23 << endl;
+    if (count21b > 0 && count22 > 0) nsel21b++;
+    else if (count21b > 0 && count23 > 1) nsel22b++;
+    else if (count21b > 0 && count23 > 0 && count24 > 0) nsel23b++;
+    
+    if (count21c > 0 && count22 > 0) nsel21c++;
+    else if (count21c > 0 && count23 > 1) nsel22c++;
+    else if (count21c > 0 && count23 > 0 && count24 > 0) nsel23c++;
+  }
+  float nsel_21a = nsel21a;
+  float nsel_22a = nsel22a;
+  float nsel_23a = nsel23a;
+  
+  float nsel_21b = nsel21b;
+  float nsel_22b = nsel22b;
+  float nsel_23b = nsel23b;
+  
+  float nsel_21c = nsel21c;
+  float nsel_22c = nsel22c;
+  float nsel_23c = nsel23c;
+    
+  cout << "nsel21: " << nsel_21a << "\t" << nsel_21b << "\t" << nsel_21c << endl;
+  cout << "nsel22: " << nsel_22a << "\t" << nsel_22b << "\t" << nsel_22c << endl;
+  cout << "nsel23: " << nsel_23a << "\t" << nsel_23b << "\t" << nsel_23c << endl;
   
   smass[0] = 170.0;
-  fraction1[0] = nsel_21/nentries2;
-  fraction2[0] = nsel_22/nentries2;
-  fraction3[0] = nsel_23/nentries2;
+  fraction1a[0] = nsel_21a/nentries2;
+  fraction2a[0] = nsel_22a/nentries2;
+  fraction3a[0] = nsel_23a/nentries2;
   
-  fraction1error[0] = sqrt(fraction1[0] * (1-fraction1[0])) / sqrt(nentries2);
-  fraction2error[0] = sqrt(fraction2[0] * (1-fraction2[0])) / sqrt(nentries2);
-  fraction3error[0] = sqrt(fraction3[0] * (1-fraction3[0])) / sqrt(nentries2);
+  fraction1b[0] = nsel_21b/nentries2;
+  fraction2b[0] = nsel_22b/nentries2;
+  fraction3b[0] = nsel_23b/nentries2;
   
-  cout << fraction1[0] << endl;
-  cout << fraction2[0] << endl;
-  cout << fraction3[0] << endl;
+  fraction1c[0] = nsel_21c/nentries2;
+  fraction2c[0] = nsel_22c/nentries2;
+  fraction3c[0] = nsel_23c/nentries2;
+  
+  fraction1aerror[0] = sqrt(fraction1a[0] * (1-fraction1a[0])) / sqrt(nentries2);
+  fraction2aerror[0] = sqrt(fraction2a[0] * (1-fraction2a[0])) / sqrt(nentries2);
+  fraction3aerror[0] = sqrt(fraction3a[0] * (1-fraction3a[0])) / sqrt(nentries2);
+  
+  fraction1berror[0] = sqrt(fraction1b[0] * (1-fraction1b[0])) / sqrt(nentries2);
+  fraction2berror[0] = sqrt(fraction2b[0] * (1-fraction2b[0])) / sqrt(nentries2);
+  fraction3berror[0] = sqrt(fraction3b[0] * (1-fraction3b[0])) / sqrt(nentries2);
+  
+  fraction1cerror[0] = sqrt(fraction1c[0] * (1-fraction1c[0])) / sqrt(nentries2);
+  fraction2cerror[0] = sqrt(fraction2c[0] * (1-fraction2c[0])) / sqrt(nentries2);
+  fraction3cerror[0] = sqrt(fraction3c[0] * (1-fraction3c[0])) / sqrt(nentries2);
+  
+  cout << fraction1a[0] << "\t" << fraction1b[0] << "\t" << fraction1c[0] << endl;
+  cout << fraction2a[0] << "\t" << fraction2b[0] << "\t" << fraction1c[0] << endl;
+  cout << fraction3a[0] << "\t" << fraction3b[0] << "\t" << fraction3c[0]<< endl;
   
   file2->Close();
 //////////////////////////////////X 2000 S 240///////////////
@@ -457,15 +571,23 @@ void b_selectionEfficiency(){
   t3->SetBranchStatus("tjet_btagged", 1);
   
   int nentries3 = t3->GetEntries();
-  int nsel31 = 0;		//counting fully boosted events that are selected
-  int nsel32 = 0;		//counting boosted events that are selected
-  int nsel33 = 0;		//counting semi-boosted events that are selected
+  int nsel31a = 0;		//counting fully boosted events that are selected
+  int nsel31b = 0;
+  int nsel31c = 0;
+  int nsel32a = 0;		//counting boosted events that are selected
+  int nsel32b = 0;
+  int nsel32c = 0;
+  int nsel33a = 0;		//counting semi-boosted events that are selected
+  int nsel33b = 0;
+  int nsel33c = 0;
   
   cout << "\nnentries3: " << nentries3 << "\tX: 2000 GeV \tS: 240 Gev" << endl;
   for (int l=0; l<nentries3; l++)			//loops over all the 20,000 entries in file3
   {
     t3->GetEntry(l);
-    int count31 = 0;
+    int count31a = 0;
+    int count31b = 0;
+    int count31c = 0;
     int count32 = 0;
     int count33 = 0;
     int count34 = 0;
@@ -491,35 +613,73 @@ void b_selectionEfficiency(){
 	float delta_r;
 	delta_r = tjet.DeltaR(ljet);
 	if (delta_r<0.2 && tjet_btagged3[l2] > 0) btag++;
-      }   
-      if (ljet.M()>105.0e3 && ljet.M()<145.0e3 && btag>1) count31++;
+      }      
+      if (ljet.M()>105.0e3 && ljet.M()<145.0e3) 
+      {
+	if (btag == 0) count31a++;
+	else if (btag == 1) count31b++;
+	else count31c++;
+      }
       if (ljet.M()>145.0e3 && btag==0) count32++;
       if (ljet.M()>60.0e3 && ljet.M()<100.0e3 && btag==0) count33++;
     }
-    if (count31 > 0 && count32 > 0) nsel31++;
-    else if (count31 > 0 && count33 > 1) nsel32++;
-    else if (count31 > 0 && count33 > 0 && count34 > 0) nsel33++;
+    if (count31a > 0 && count32 > 0) nsel31a++;
+    else if (count31a > 0 && count33 > 1) nsel32a++;
+    else if (count31a > 0 && count33 > 0 && count34 > 0) nsel33a++;
+    
+    if (count31b > 0 && count32 > 0) nsel31b++;
+    else if (count31b > 0 && count33 > 1) nsel32b++;
+    else if (count31b > 0 && count33 > 0 && count34 > 0) nsel33b++;
+    
+    if (count31c > 0 && count32 > 0) nsel31c++;
+    else if (count31c > 0 && count33 > 1) nsel32c++;
+    else if (count31c > 0 && count33 > 0 && count34 > 0) nsel33c++;
   }
-  float nsel_31 = nsel31;
-  float nsel_32 = nsel32;
-  float nsel_33 = nsel33;
+  float nsel_31a = nsel31a;
+  float nsel_32a = nsel32a;
+  float nsel_33a = nsel33a;
   
-  cout << "nsel31: " << nsel_31 << endl;
-  cout << "nsel32: " << nsel_32 << endl;
-  cout << "nsel33: " << nsel_33 << endl;
+  float nsel_31b = nsel31b;
+  float nsel_32b = nsel32b;
+  float nsel_33b = nsel33b;
+  
+  float nsel_31c = nsel31c;
+  float nsel_32c = nsel32c;
+  float nsel_33c = nsel33c;
+  
+  cout << "nsel31: " << nsel_31a << "\t" << nsel_31b << "\t" << nsel_31c << endl;
+  cout << "nsel32: " << nsel_32a << "\t" << nsel_32b << "\t" << nsel_32c << endl;
+  cout << "nsel33: " << nsel_33a << "\t" << nsel_33b << "\t" << nsel_33c << endl;
   
   smass[1] = 240.0;
-  fraction1[1] = nsel_31/nentries3;
-  fraction2[1] = nsel_32/nentries3;
-  fraction3[1] = nsel_33/nentries3;
+  fraction1a[1] = nsel_21a/nentries3;
+  fraction2a[1] = nsel_22a/nentries3;
+  fraction3a[1] = nsel_23a/nentries3;
   
-  fraction1error[1] = sqrt(fraction1[1] * (1-fraction1[1])) / sqrt(nentries3);
-  fraction2error[1] = sqrt(fraction2[1] * (1-fraction2[1])) / sqrt(nentries3);
-  fraction3error[1] = sqrt(fraction3[1] * (1-fraction3[1])) / sqrt(nentries3);
+  fraction1b[1] = nsel_21b/nentries3;
+  fraction2b[1] = nsel_22b/nentries3;
+  fraction3b[1] = nsel_23b/nentries3;
   
-  cout << fraction1[1] << endl;
-  cout << fraction2[1] << endl;
-  cout << fraction3[1] << endl;
+  fraction1c[1] = nsel_21c/nentries3;
+  fraction2c[1] = nsel_22c/nentries3;
+  fraction3c[1] = nsel_23c/nentries3;
+  
+  fraction1aerror[1] = sqrt(fraction1a[1] * (1-fraction1a[1])) / sqrt(nentries3);
+  fraction2aerror[1] = sqrt(fraction2a[1] * (1-fraction2a[1])) / sqrt(nentries3);
+  fraction3aerror[1] = sqrt(fraction3a[1] * (1-fraction3a[1])) / sqrt(nentries3);
+  
+  fraction1berror[1] = sqrt(fraction1b[1] * (1-fraction1b[1])) / sqrt(nentries3);
+  fraction2berror[1] = sqrt(fraction2b[1] * (1-fraction2b[1])) / sqrt(nentries3);
+  fraction3berror[1] = sqrt(fraction3b[1] * (1-fraction3b[1])) / sqrt(nentries3);
+  
+  fraction1cerror[1] = sqrt(fraction1c[1] * (1-fraction1c[1])) / sqrt(nentries3);
+  fraction2cerror[1] = sqrt(fraction2c[1] * (1-fraction2c[1])) / sqrt(nentries3);
+  fraction3cerror[1] = sqrt(fraction3c[1] * (1-fraction3c[1])) / sqrt(nentries3);
+  
+  cout << fraction1a[1] << "\t" << fraction1b[1] << "\t" << fraction1c[1] << endl;
+  cout << fraction2a[1] << "\t" << fraction2b[1] << "\t" << fraction1c[1] << endl;
+  cout << fraction3a[1] << "\t" << fraction3b[1] << "\t" << fraction3c[1]<< endl;
+  
   file3->Close();
   
 ///////////////////////////////X 2000 S 400//////////////////////////////////////////////////
@@ -584,15 +744,23 @@ void b_selectionEfficiency(){
   t4->SetBranchStatus("tjet_btagged", 1);
   
   int nentries4 = t4->GetEntries();
-  int nsel41 = 0;		//counting fully boosted events that are selected
-  int nsel42 = 0;		//counting boosted events that are selected
-  int nsel43 = 0;		//counting semi-boosted events that are selected
+  int nsel41a = 0;		//counting fully boosted events that are selected
+  int nsel41b = 0;
+  int nsel41c = 0;
+  int nsel42a = 0;		//counting boosted events that are selected
+  int nsel42b = 0;
+  int nsel42c = 0;
+  int nsel43a = 0;		//counting semi-boosted events that are selected
+  int nsel43b = 0;
+  int nsel43c = 0;
   
   cout << "\nnentries4: " << nentries4 << "\tX: 2000 GeV \tS: 400 Gev" << endl;
   for (int m=0; m<nentries4; m++)			//loops over all the 20,000 entries in file4
   {
     t4->GetEntry(m);
-    int count41 = 0;
+    int count41a = 0;
+    int count41b = 0;
+    int count41c = 0;
     int count42 = 0;
     int count43 = 0;
     int count44 = 0;
@@ -617,36 +785,73 @@ void b_selectionEfficiency(){
 	float delta_r;
 	delta_r = tjet.DeltaR(ljet);
 	if (delta_r<0.2 && tjet_btagged4[m2] > 0) btag++;
-      }    
-      if (ljet.M()>105.0e3 && ljet.M()<145.0e3 &&  btag>1) count41++;
+      }      
+      if (ljet.M()>105.0e3 && ljet.M()<145.0e3)
+      {
+	if (btag == 0) count41a++;
+	else if (btag == 1) count41b++;
+	else count41c++;
+      }
       if (ljet.M()>145.0e3 && btag==0) count42++;
       if (ljet.M()>60.0e3 && ljet.M()<100.0e3 && btag==0) count43++;      
     }
     
-    if (count41 > 0 && count42 > 0) nsel41++;
-    else if (count41 > 0 && count43 > 1) nsel42++;
-    else if (count41 > 0 && count43 > 0 && count44 > 0) nsel43++;
+    if (count41a > 0 && count42 > 0) nsel41a++;
+    else if (count41a > 0 && count43 > 1) nsel42a++;
+    else if (count41a > 0 && count43 > 0 && count44 > 0) nsel43a++;
+    
+    if (count41b > 0 && count42 > 0) nsel41b++;
+    else if (count41b > 0 && count43 > 1) nsel42b++;
+    else if (count41b > 0 && count43 > 0 && count44 > 0) nsel43b++;
+    
+    if (count41c > 0 && count42 > 0) nsel41c++;
+    else if (count41c > 0 && count43 > 1) nsel42c++;
+    else if (count41c > 0 && count43 > 0 && count44 > 0) nsel43c++;
   }
-  float nsel_41 = nsel41;
-  float nsel_42 = nsel42;
-  float nsel_43 = nsel43;
+  float nsel_41a = nsel41a;
+  float nsel_42a = nsel42a;
+  float nsel_43a = nsel43a;
+
+  float nsel_41b = nsel41b;
+  float nsel_42b = nsel42b;
+  float nsel_43b = nsel43b;
   
-  cout << "nsel41: " << nsel_41 << endl;
-  cout << "nsel42: " << nsel_42 << endl;
-  cout << "nsel43: " << nsel_43 << endl;
+  float nsel_41c = nsel41c;
+  float nsel_42c = nsel42c;
+  float nsel_43c = nsel43c;
+  
+  cout << "nsel41: " << nsel_41a << "\t" << nsel_41b << "\t" << nsel_41c << endl;
+  cout << "nsel42: " << nsel_42a << "\t" << nsel_42b << "\t" << nsel_42c << endl;
+  cout << "nsel43: " << nsel_43a << "\t" << nsel_43b << "\t" << nsel_43c << endl;
   
   smass[2] = 400.0;
-  fraction1[2] = nsel_41/nentries4;
-  fraction2[2] = nsel_42/nentries4;
-  fraction3[2] = nsel_43/nentries4;
+  fraction1a[2] = nsel_41a/nentries4;
+  fraction2a[2] = nsel_42a/nentries4;
+  fraction3a[2] = nsel_43a/nentries4;
   
-  fraction1error[2] = sqrt(fraction1[2] * (1-fraction1[2])) / sqrt(nentries4);
-  fraction2error[2] = sqrt(fraction2[2] * (1-fraction2[2])) / sqrt(nentries4);
-  fraction3error[2] = sqrt(fraction3[2] * (1-fraction3[2])) / sqrt(nentries4);
+  fraction1b[2] = nsel_41b/nentries4;
+  fraction2b[2] = nsel_42b/nentries4;
+  fraction3b[2] = nsel_43b/nentries4;
   
-  cout << fraction1[2] << endl;
-  cout << fraction2[2] << endl;
-  cout << fraction3[2] << endl;
+  fraction1c[2] = nsel_41c/nentries4;
+  fraction2c[2] = nsel_42c/nentries4;
+  fraction3c[2] = nsel_43c/nentries4;
+  
+  fraction1aerror[2] = sqrt(fraction1a[2] * (1-fraction1a[2])) / sqrt(nentries4);
+  fraction2aerror[2] = sqrt(fraction2a[2] * (1-fraction2a[2])) / sqrt(nentries4);
+  fraction3aerror[2] = sqrt(fraction3a[2] * (1-fraction3a[2])) / sqrt(nentries4);
+
+  fraction1berror[2] = sqrt(fraction1b[2] * (1-fraction1b[2])) / sqrt(nentries4);
+  fraction2berror[2] = sqrt(fraction2b[2] * (1-fraction2b[2])) / sqrt(nentries4);
+  fraction3berror[2] = sqrt(fraction3b[2] * (1-fraction3b[2])) / sqrt(nentries4);
+  
+  fraction1cerror[2] = sqrt(fraction1c[2] * (1-fraction1c[2])) / sqrt(nentries4);
+  fraction2cerror[2] = sqrt(fraction2c[2] * (1-fraction2c[2])) / sqrt(nentries4);
+  fraction3cerror[2] = sqrt(fraction3c[2] * (1-fraction3c[2])) / sqrt(nentries4);
+  
+  cout << fraction1a[2] << "\t" << fraction1b[2] << "\t" << fraction1c[2] << endl;
+  cout << fraction2a[2] << "\t" << fraction2b[2] << "\t" << fraction1c[2] << endl;
+  cout << fraction3a[2] << "\t" << fraction3b[2] << "\t" << fraction3c[2]<< endl;
   
   file4->Close();
   
@@ -712,14 +917,22 @@ void b_selectionEfficiency(){
   t5->SetBranchStatus("tjet_btagged", 1);
   
   int nentries5 = t5->GetEntries();
-  int nsel51 = 0;		//counting fully boosted events that are selected
-  int nsel52 = 0;		//counting boosted events that are selected
-  int nsel53 = 0;		//counting semi-boosted events that are selected
+  int nsel51a = 0;		//counting fully boosted events that are selected
+  int nsel51b = 0;
+  int nsel51c = 0;
+  int nsel52a = 0;		//counting boosted events that are selected
+  int nsel52b = 0;
+  int nsel52c = 0;
+  int nsel53a = 0;		//counting semi-boosted events that are selected
+  int nsel53b = 0;
+  int nsel53c = 0;
   cout << "\nnentries5: " << nentries5 << "\tX: 2000 GeV \tS: 750 Gev" << endl;
   for (int n=0; n<nentries5; n++)			//loops over all the 20,000 entries in file5
   {
     t5->GetEntry(n);
-    int count51 = 0;
+    int count51a = 0;
+    int count51b = 0;
+    int count51c = 0;
     int count52 = 0;
     int count53 = 0;
     int count54 = 0;
@@ -744,37 +957,74 @@ void b_selectionEfficiency(){
 	float delta_r;
 	delta_r = tjet.DeltaR(ljet);
 	if (delta_r<0.2 && tjet_btagged5[n2] > 0) btag++;
-      } 
-      if (ljet.M()>105.0e3 && ljet.M()<145.0e3 && btag>1) count51++;
-      if (ljet.M()>145.0e3 && btag==0) count52++;
-      if (ljet.M()>60.0e3 && ljet.M()<100.0e3 && btag==0) count53++;
+      }      
+      if (ljet.M()>105.0e3 && ljet.M()<145.0e3)
+      {
+	if (btag == 0) count51a++;
+	else if (btag == 1) count51b++;
+	else count51c++;
+      }
+      if (ljet.M()>145.0e3 && btag>0) count52++;
+      if (ljet.M()>60.0e3 && ljet.M()<100.0e3 && btag>0) count53++;
     }
     
-    if (count51 > 0 && count52 > 0) nsel51++;
-    else if (count51 > 0 && count53 > 1) nsel52++;
-    else if (count51 > 0 && count53 > 0 && count54 > 0) nsel53++;
+    if (count51a > 0 && count52 > 0) nsel51a++;
+    else if (count51a > 0 && count53 > 1) nsel52a++;
+    else if (count51a > 0 && count53 > 0 && count54 > 0) nsel53a++;
+    
+    if (count51b > 0 && count52 > 0) nsel51b++;
+    else if (count51b > 0 && count53 > 1) nsel52b++;
+    else if (count51b > 0 && count53 > 0 && count54 > 0) nsel53b++;
+    
+    if (count51c > 0 && count52 > 0) nsel51c++;
+    else if (count51c > 0 && count53 > 1) nsel52c++;
+    else if (count51c > 0 && count53 > 0 && count54 > 0) nsel53c++;
     
   }
-  float nsel_51 = nsel51;
-  float nsel_52 = nsel52;
-  float nsel_53 = nsel53;
+  float nsel_51a = nsel51a;
+  float nsel_52a = nsel52a;
+  float nsel_53a = nsel53a;
   
-  cout << "nsel51: " << nsel_51 << endl;
-  cout << "nsel52: " << nsel_52 << endl;
-  cout << "nsel53: " << nsel_53 << endl;
+  float nsel_51b = nsel51b;
+  float nsel_52b = nsel52b;
+  float nsel_53b = nsel53b;
+  
+  float nsel_51c = nsel51c;
+  float nsel_52c = nsel52c;
+  float nsel_53c = nsel53c;
+  
+  cout << "nsel51: " << nsel_51a << "\t" << nsel_51b << "\t" << nsel_51c << endl;
+  cout << "nsel52: " << nsel_52a << "\t" << nsel_52b << "\t" << nsel_52c << endl;
+  cout << "nsel53: " << nsel_53a << "\t" << nsel_53b << "\t" << nsel_53c << endl;
   
   smass[3] = 750.0;
-  fraction1[3] = nsel_51/nentries5;
-  fraction2[3] = nsel_52/nentries5;
-  fraction3[3] = nsel_53/nentries5;
+  fraction1a[3] = nsel_51a/nentries5;
+  fraction2a[3] = nsel_52a/nentries5;
+  fraction3a[3] = nsel_53a/nentries5;
   
-  fraction1error[3] = sqrt(fraction1[3] * (1-fraction1[3])) / sqrt(nentries5);
-  fraction2error[3] = sqrt(fraction2[3] * (1-fraction2[3])) / sqrt(nentries5);
-  fraction3error[3] = sqrt(fraction3[3] * (1-fraction3[3])) / sqrt(nentries5);
+  fraction1b[3] = nsel_51b/nentries5;
+  fraction2b[3] = nsel_52b/nentries5;
+  fraction3b[3] = nsel_53b/nentries5;
   
-  cout << fraction1[3] << endl;
-  cout << fraction2[3] << endl;
-  cout << fraction3[3] << endl;
+  fraction1c[3] = nsel_51c/nentries5;
+  fraction2c[3] = nsel_52c/nentries5;
+  fraction3c[3] = nsel_53c/nentries5;
+  
+  fraction1aerror[3] = sqrt(fraction1a[3] * (1-fraction1a[3])) / sqrt(nentries5);
+  fraction2aerror[3] = sqrt(fraction2a[3] * (1-fraction2a[3])) / sqrt(nentries5);
+  fraction3aerror[3] = sqrt(fraction3a[3] * (1-fraction3a[3])) / sqrt(nentries5);
+
+  fraction1berror[3] = sqrt(fraction1b[3] * (1-fraction1b[3])) / sqrt(nentries5);
+  fraction2berror[3] = sqrt(fraction2b[3] * (1-fraction2b[3])) / sqrt(nentries5);
+  fraction3berror[3] = sqrt(fraction3b[3] * (1-fraction3b[3])) / sqrt(nentries5);
+  
+  fraction1cerror[3] = sqrt(fraction1c[3] * (1-fraction1c[3])) / sqrt(nentries5);
+  fraction2cerror[3] = sqrt(fraction2c[3] * (1-fraction2c[3])) / sqrt(nentries5);
+  fraction3cerror[3] = sqrt(fraction3c[3] * (1-fraction3c[3])) / sqrt(nentries5);
+  
+  cout << fraction1a[3] << "\t" << fraction1b[3] << "\t" << fraction1c[3] << endl;
+  cout << fraction2a[3] << "\t" << fraction2b[3] << "\t" << fraction1c[3] << endl;
+  cout << fraction3a[3] << "\t" << fraction3b[3] << "\t" << fraction3c[3]<< endl;
   
   file5->Close();
   
@@ -840,15 +1090,23 @@ void b_selectionEfficiency(){
   t6->SetBranchStatus("tjet_btagged", 1);
   
   int nentries6 = t6->GetEntries();
-  int nsel61 = 0;		//counting fully boosted events that are selected
-  int nsel62 = 0;		//counting boosted events that are selected
-  int nsel63 = 0;		//counting semi-boosted events that are selected
+  int nsel61a = 0;		//counting fully boosted events that are selected
+  int nsel61b = 0;
+  int nsel61c = 0;
+  int nsel62a = 0;		//counting boosted events that are selected
+  int nsel62b = 0;
+  int nsel62c = 0;
+  int nsel63a = 0;		//counting semi-boosted events that are selected
+  int nsel63b = 0;
+  int nsel63c = 0;
   
   cout << "\nnentries6: " << nentries6 << "\tX: 2000 GeV \tS: 1000 Gev" << endl;
   for (int p=0; p<nentries6; p++)			//loops over all the 20,000 entries in file6
   {
     t6->GetEntry(p);
-    int count61 = 0;
+    int count61a = 0;
+    int count61b = 0;
+    int count61c = 0;
     int count62 = 0;
     int count63 = 0;
     int count64 = 0;
@@ -874,72 +1132,109 @@ void b_selectionEfficiency(){
 	float delta_r;
 	delta_r = tjet.DeltaR(ljet);
 	if (delta_r<0.2 && tjet_btagged0[p2] > 0) btag++;
+      }      
+      if (ljet.M()>105.0e3 && ljet.M()<145.0e3)
+      {
+	if (btag == 0) count61a++;
+	else if (btag == 1) count61b++;
+	else count61c++;
       }
-      if (ljet.M()>105.0e3 && ljet.M()<145.0e3 && btag>1) count61++;
       if (ljet.M()>145.0e3 && btag==0) count62++;
       if (ljet.M()>60.0e3 && ljet.M()<100.0e3 && btag==0) count63++;
     }
     
-    if (count61 > 0 && count62 > 0) nsel61++;
-    else if (count61 > 0 && count63 > 1) nsel62++;
-    else if (count61 > 0 && count63 > 0 && count64 > 0) nsel63++;
+    if (count61a > 0 && count62 > 0) nsel61a++;
+    else if (count61a > 0 && count63 > 1) nsel62a++;
+    else if (count61a > 0 && count63 > 0 && count64 > 0) nsel63a++;
     
+    if (count61b > 0 && count62 > 0) nsel61b++;
+    else if (count61b > 0 && count63 > 1) nsel62b++;
+    else if (count61b > 0 && count63 > 0 && count64 > 0) nsel63b++;
+    
+    if (count61c > 0 && count62 > 0) nsel61c++;
+    else if (count61c > 0 && count63 > 1) nsel62c++;
+    else if (count61c > 0 && count63 > 0 && count64 > 0) nsel63c++;
   }
-  float nsel_61 = nsel61;
-  float nsel_62 = nsel62;
-  float nsel_63 = nsel63;
+  float nsel_61a = nsel61a;
+  float nsel_62a = nsel62a;
+  float nsel_63a = nsel63a;
   
-  cout << "nsel61: " << nsel_61 << endl;
-  cout << "nsel62: " << nsel_62 << endl;
-  cout << "nsel63: " << nsel_63 << endl;
+  float nsel_61b = nsel61b;
+  float nsel_62b = nsel62b;
+  float nsel_63b = nsel63b;
+  
+  float nsel_61c = nsel61c;
+  float nsel_62c = nsel62c;
+  float nsel_63c = nsel63c;
+  
+  cout << "nsel61: " << nsel_61a << "\t" << nsel_61b << "\t" << nsel_61c << endl;
+  cout << "nsel62: " << nsel_62a << "\t" << nsel_62b << "\t" << nsel_62c << endl;
+  cout << "nsel63: " << nsel_63a << "\t" << nsel_63b << "\t" << nsel_63c << endl;
   
   smass[4] = 1000.0;
-  fraction1[4] = nsel_61/nentries6;
-  fraction2[4] = nsel_62/nentries6;
-  fraction3[4] = nsel_63/nentries6;
+  fraction1a[4] = nsel_61a/nentries6;
+  fraction2a[4] = nsel_62a/nentries6;
+  fraction3a[4] = nsel_63a/nentries6;
   
-  fraction1error[4] = sqrt(fraction1[4] * (1-fraction1[4])) / sqrt(nentries6);
-  fraction2error[4] = sqrt(fraction2[4] * (1-fraction2[4])) / sqrt(nentries6);
-  fraction3error[4] = sqrt(fraction3[4] * (1-fraction3[4])) / sqrt(nentries6);
+  fraction1b[4] = nsel_61b/nentries6;
+  fraction2b[4] = nsel_62b/nentries6;
+  fraction3b[4] = nsel_63b/nentries6;
   
-  cout << fraction1[4] << endl;
-  cout << fraction2[4] << endl;
-  cout << fraction3[4] << endl;
+  fraction1c[4] = nsel_61c/nentries6;
+  fraction2c[4] = nsel_62c/nentries6;
+  fraction3c[4] = nsel_63c/nentries6;
+  
+  fraction1aerror[4] = sqrt(fraction1a[4] * (1-fraction1a[4])) / sqrt(nentries6);
+  fraction2aerror[4] = sqrt(fraction2a[4] * (1-fraction2a[4])) / sqrt(nentries6);
+  fraction3aerror[4] = sqrt(fraction3a[4] * (1-fraction3a[4])) / sqrt(nentries6);
+  
+  fraction1berror[4] = sqrt(fraction1b[4] * (1-fraction1b[4])) / sqrt(nentries6);
+  fraction2berror[4] = sqrt(fraction2b[4] * (1-fraction2b[4])) / sqrt(nentries6);
+  fraction3berror[4] = sqrt(fraction3b[4] * (1-fraction3b[4])) / sqrt(nentries6);
+  
+  fraction1cerror[4] = sqrt(fraction1c[4] * (1-fraction1c[4])) / sqrt(nentries6);
+  fraction2cerror[4] = sqrt(fraction2c[4] * (1-fraction2c[4])) / sqrt(nentries6);
+  fraction3cerror[4] = sqrt(fraction3c[4] * (1-fraction3c[4])) / sqrt(nentries6);
+  
+  cout << fraction1a[4] << "\t" << fraction1b[4] << "\t" << fraction1c[4] << endl;
+  cout << fraction2a[4] << "\t" << fraction2b[4] << "\t" << fraction1c[4] << endl;
+  cout << fraction3a[4] << "\t" << fraction3b[4] << "\t" << fraction3c[4]<< endl;
   
   file6->Close();
  
 /////////////////////////////////////////////////////////////////////////////////
   
-  TFile f("b_selectionEfficiency.root", "recreate");
+  TFile f("b_selectionEfficiency_3btags.root", "recreate");
 
   ca = new TCanvas("ca", "Event Selection Efficiency for different S mass points", 1200, 900);
-  ca -> SetFillColor(kYellow-10);
+  ca -> Divide(1,1);
   
   float ex[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   
-  gr1 = new TGraphErrors(6, smass, fraction1, ex, fraction1error);
-  gr2 = new TGraphErrors(6, smass, fraction2, ex, fraction2error);
-  gr3 = new TGraphErrors(6, smass, fraction3, ex, fraction3error);
+  ca -> cd(1);
+  gr1 = new TGraphErrors(6, smass, fraction1a, ex, fraction1aerror);
+  gr2 = new TGraphErrors(6, smass, fraction2a, ex, fraction2aerror);
+  gr3 = new TGraphErrors(6, smass, fraction3a, ex, fraction3aerror);
   
-  gr1->SetFillColor(kYellow-10);
-  gr1->SetLineColor(1);
-  gr1->SetLineWidth(3);
+  gr1->SetFillColor(kWhite);
+  gr1->SetLineColor(3);
+  gr1->SetLineWidth(2);
   gr1->SetMarkerStyle(2);
-  gr1->SetMarkerColor(1);
+  gr1->SetMarkerColor(3);
   gr1->SetTitle("Event Selection Efficiency at different S mass points for M_{X} = 2 TeV (with b-tagging)");
-  gr1->GetXaxis()->SetTitle("M_{S}   [GeV]");
-  gr1->GetYaxis()->SetRangeUser(0.0, 0.5); 
+  gr1->GetXaxis()->SetTitle("Mass of the S Particle, M_{S} [GeV]");
+  gr1->GetYaxis()->SetRangeUser(0.0, 0.3); 
   gr1->GetYaxis()->SetTitle("Fraction of Events");
   
-  gr2->SetFillColor(kYellow-10);
+  gr2->SetFillColor(kWhite);
   gr2->SetLineColor(2);
-  gr2->SetLineWidth(3);
+  gr2->SetLineWidth(2);
   gr2->SetMarkerStyle(2);
   gr2->SetMarkerColor(2);
   
-  gr3->SetFillColor(kYellow-10);
+  gr3->SetFillColor(kWhite);
   gr3->SetLineColor(4);
-  gr3->SetLineWidth(3);
+  gr3->SetLineWidth(2);
   gr3->SetMarkerStyle(2);
   gr3->SetMarkerColor(4);
   
@@ -948,7 +1243,6 @@ void b_selectionEfficiency(){
   gr3->Draw("same");
   
   auto legend = new TLegend(0.6,0.6,0.9,0.8);	// (x1, y1, x2, y2)
-  legend->SetFillColor(kYellow-10);
   legend->AddEntry(gr1,"Fully Boosted: 1 H + WW jet");
   legend->AddEntry(gr2,"Boosted: 1 H + 2 W");
   legend->AddEntry(gr3, "Semi-Boosted: 1 H + 1 W + 1 W_{j j}");
@@ -957,4 +1251,3 @@ void b_selectionEfficiency(){
   f.Close();
   
 }
- 

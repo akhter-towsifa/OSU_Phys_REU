@@ -5,7 +5,7 @@
 #include "TH1I.h"
 #include "TF1.h"
 #include "TROOT.h"
-#include "TStyle.h"
+// #include "TStyle.h"
 #include "iostream"
 #include "array"
 #include <bits/stdc++.h>
@@ -13,13 +13,16 @@
 #include <math.h>
 #include <cmath>
 #include "TCanvas.h"
-#include "TLegend.h" 
+// #include "TLegend.h" 
 #include "TLorentzVector.h"
+#include "TGraph.h"
+#include "TGraphPainter.h"
+#include "TGraphErrors.h"
 
 //This code finds the large jet and Higgs Boson, S masses using the bbww_x2000_s1500 file (large jet: 1H, >1 W's)
 
 void a_1_x2000_s1500(){
-  gStyle -> SetOptStat("nemr");
+  gStyle -> SetOptStat("");
   int nbins = 1000;
   int w = 1;				//weight
   
@@ -100,13 +103,13 @@ void a_1_x2000_s1500(){
 	  }
 	}
 	S = W1 + W2;
-	/*if(S.M()>0) */h_S->Fill(S.M(), w);
+	if(S.M()>0) h_S->Fill(S.M(), w);
 	if(S.M() > 1400e3 && S.M() < 1550e3) h_S_totalnumber->Fill(S.M(), w);
 	
       }
     }  
     X = H + S;
-    /*if (X.M() > 0) */h_X->Fill(X.M(), w);
+    if (X.M() > 0) h_X->Fill(X.M(), w);
     if (X.M() > 1850e3 && X.M() < 2100e3) h_X_totalnumber->Fill(X.M(), w);
     
   } 
@@ -123,8 +126,9 @@ void a_1_x2000_s1500(){
   h_X -> Write();
   h_X_totalnumber -> Write();
   
-  c = new TCanvas("canvas", "M_Higgs_S_X", 2000, 1000);
-  c -> Divide (3,2);
+  c = new TCanvas("canvas", "M_Higgs_S_X", 1000, 1000);
+  c -> SetFillColor(kYellow-10);
+  c -> Divide (2,3);
   
   c -> cd(1);
   h_Minv -> Draw();
@@ -144,14 +148,14 @@ void a_1_x2000_s1500(){
   c -> cd(6);
   h_X -> Draw();
   
-  c1 = new TCanvas("canvas1", "M_S_X", 2000, 500);
-  c1 -> Divide (2,1);
-  
-  c1 -> cd(1);
-  h_S_totalnumber -> Draw();
-  
-  c1 -> cd(2);
-  h_X_totalnumber -> Draw();
+//   c1 = new TCanvas("canvas1", "M_S_X", 2000, 500);
+//   c1 -> Divide (2,1);
+//   
+//   c1 -> cd(1);
+//   h_S_totalnumber -> Draw();
+//   
+//   c1 -> cd(2);
+//   h_X_totalnumber -> Draw();
   
   f.Close();
 } 

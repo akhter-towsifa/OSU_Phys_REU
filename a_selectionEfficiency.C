@@ -89,7 +89,7 @@ void a_selectionEfficiency(){
       TLorentzVector ljet;				//Defines a Lorentz vector "ljet" that stores the large jets in each iteration j over all large jets
       ljet.SetPtEtaPhiE(ljet_pt0[i0], ljet_eta0[i0], ljet_phi0[i0], ljet_e0[i0]);
       if (ljet.M()>105.0e3 && ljet.M()<145.0e3) count01++;
-      if (ljet.M()>160.0e3) count02++;
+      if (ljet.M()>145.0e3) count02++;
       if (ljet.M()>60.0e3 && ljet.M()<100.0e3) count03++;
       
       int countb0 = 0;
@@ -725,32 +725,33 @@ void a_selectionEfficiency(){
   
   TFile f("a_selectionEfficiency.root", "recreate");
 
-  ca = new TCanvas("ca", "Event Selection Efficiency for different S mass points", 1000, 500);
-  ca -> Divide(1,1);
-  
+  ca = new TCanvas("ca", "Event Selection Efficiency for different S mass points", 1200, 900);
+  ca -> SetFillColor(kYellow-10);
   float ex[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   
-  ca -> cd(1);
   gr1 = new TGraphErrors(6, smass, fraction1, ex, fraction1error);
   gr2 = new TGraphErrors(6, smass, fraction2, ex, fraction2error);
   gr3 = new TGraphErrors(6, smass, fraction3, ex, fraction3error);
   
-  gr1->SetLineColor(3);
-  gr1->SetLineWidth(2);
+  gr1->SetFillColor(kYellow-10);
+  gr1->SetLineColor(1);
+  gr1->SetLineWidth(3);
   gr1->SetMarkerStyle(2);
-  gr1->SetMarkerColor(3);
+  gr1->SetMarkerColor(1);
   gr1->SetTitle("Event Selection Efficiency at different S mass points for M_{X} = 2 TeV (without b-tagging)");
-  gr1->GetXaxis()->SetTitle("M_{S} [GeV]");
+  gr1->GetXaxis()->SetTitle("M_{S}    [GeV]");
   gr1->GetYaxis()->SetRangeUser(0.0, 0.5); 
   gr1->GetYaxis()->SetTitle("Fraction of Events");
   
+  gr2->SetFillColor(kYellow-10);
   gr2->SetLineColor(2);
-  gr2->SetLineWidth(2);
+  gr2->SetLineWidth(3);
   gr2->SetMarkerStyle(2);
   gr2->SetMarkerColor(2);
   
+  gr3->SetFillColor(kYellow-10);
   gr3->SetLineColor(4);
-  gr3->SetLineWidth(2);
+  gr3->SetLineWidth(3);
   gr3->SetMarkerStyle(2);
   gr3->SetMarkerColor(4);
   
@@ -759,9 +760,10 @@ void a_selectionEfficiency(){
   gr3->Draw("same");
   
   auto legend = new TLegend(0.6,0.6,0.9,0.8);	// (x1, y1, x2, y2)
+  legend->SetFillColor(kYellow-10);
   legend->AddEntry(gr1,"Fully Boosted: 1 H + WW jet");
   legend->AddEntry(gr2,"Boosted: 1 H + 2 W");
-  legend->AddEntry(gr3, "Semi-Boosted: 1 H + 1 W + 1 W_{b#bar{b}}");
+  legend->AddEntry(gr3, "Semi-Boosted: 1 H + 1 W + 1 W_{j j}");
   legend->Draw();
   
   f.Close();
