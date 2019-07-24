@@ -26,14 +26,14 @@ void a_1_x2000_s1500(){
   int nbins = 1000;
   int w = 1;				//weight
   
-  auto h_Minv = new TH1F("M_{inv}", "Invariant Mass of the Higgs Boson and W from large jet; Mass [MeV]", nbins, 0.0, 2.0e5);
-  auto h_Higgs = new TH1F("M_{inv} Higgs", "Invariant Mass of the Higgs Boson from large jet; Mass [MeV]", nbins, 0.0, 2.0e5);
-  auto h_W1 = new TH1F("M_{inv} W1", "Invariant Mass of first W Boson from large jet; Mass [MeV]", nbins, 0.0, 2.0e5);
-  auto h_W2 = new TH1F("M_{inv} W2", "Invariant Mass of second W Boson from large jet; Mass [MeV]", nbins, 0.0, 2.0e5);
-  auto h_S = new TH1F("M_{inv} S", "Invariant Mass of the S particle from W's; Mass [MeV]", nbins, 0.0, 3.0e6);
-  auto h_S_totalnumber = new TH1F("M_{inv} S number", "Invariant Mass of the S particle from W's; Mass [MeV]", nbins, 0.0, 3.0e6);
-  auto h_X = new TH1F("M_{inv} X", "Invariant Mass of the X Particle from large jet Higgs and W; Mass [MeV]", nbins, 0.0, 3.0e6);
-  auto h_X_totalnumber = new TH1F("M_{inv} X number", "Invariant Mass of the X Particle from large jet Higgs and W; Mass [MeV]", nbins, 0.0, 3.0e6);
+  auto h_Minv = new TH1F("M_{inv}", "Invariant Mass of the Higgs Boson and W from large jet; Mass [MeV]; Events", nbins, 0.0, 2.0e5);
+  auto h_Higgs = new TH1F("M_{inv} Higgs", "Invariant Mass of the Higgs Boson from large jet; Mass [MeV]; Events", nbins, 0.0, 2.0e5);
+  auto h_W1 = new TH1F("M_{inv} W1", "Invariant Mass of first W Boson from large jet; Mass [MeV]; Events", nbins, 0.0, 2.0e5);
+  auto h_W2 = new TH1F("M_{inv} W2", "Invariant Mass of second W Boson from large jet; Mass [MeV]; Events", nbins, 0.0, 2.0e5);
+  auto h_S = new TH1F("M_{inv} S", "Invariant Mass of the S particle from W's; Mass [MeV]; Events", nbins, 0.0, 3.0e6);
+  auto h_S_totalnumber = new TH1F("M_{inv} S number", "Invariant Mass of the S particle from W's; Mass [MeV]; Events", nbins, 0.0, 3.0e6);
+  auto h_X = new TH1F("M_{inv} X", "Invariant Mass of the X Particle from large jet Higgs and W; Mass [MeV]; Events", nbins, 0.0, 3.0e6);
+  auto h_X_totalnumber = new TH1F("M_{inv} X number", "Invariant Mass of the X Particle from large jet Higgs and W; Mass [MeV]; Events", nbins, 0.0, 3.0e6);
   
   auto file = TFile::Open("bbww_x2000_s1500.root");
   TTree* ctree = (TTree*)file->Get("CollectionTree");
@@ -127,25 +127,37 @@ void a_1_x2000_s1500(){
   h_X_totalnumber -> Write();
   
   c = new TCanvas("canvas", "M_Higgs_S_X", 1000, 1000);
-  c -> SetFillColor(kYellow-10);
+//   c -> SetFillColor(kYellow-10);
   c -> Divide (2,3);
   
   c -> cd(1);
+  h_Minv -> SetFillColor(kViolet-9);
+  h_Minv -> SetLineColor(kViolet-8);
   h_Minv -> Draw();
   
   c -> cd(2);
+  h_Higgs -> SetFillColor(kAzure-9);
+  h_Higgs -> SetLineColor(kAzure-6);
   h_Higgs -> Draw();
   
   c -> cd(3);
+  h_W1 -> SetFillColor(kGreen-10);
+  h_W1 -> SetLineColor(kGreen-6);
   h_W1 -> Draw();
   
   c -> cd(4);
+  h_W2 -> SetFillColor(kYellow-9);
+  h_W2 -> SetLineColor(kOrange+0);
   h_W2 -> Draw();
   
   c -> cd(5);
+  h_S -> SetFillColor(kOrange-2);
+  h_S -> SetLineColor(kOrange+7);
   h_S -> Draw();
   
   c -> cd(6);
+  h_X -> SetFillColor(kRed-9);
+  h_X -> SetLineColor(kRed+1);
   h_X -> Draw();
   
 //   c1 = new TCanvas("canvas1", "M_S_X", 2000, 500);

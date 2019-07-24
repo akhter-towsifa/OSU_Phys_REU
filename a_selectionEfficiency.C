@@ -26,6 +26,7 @@ void a_selectionEfficiency(){
   
   float smass[6], fraction1[6], fraction2[6], fraction3[6];	//smass list collects all the 6 S mass; fraction1,2,3 lists collect the nsel/nentries ratio at each of these mass points 
   float fraction1error[6], fraction2error[6], fraction3error[6];
+  float totalEfficiency[6], totalEfficiencyError[6];
   
 ////////////////////////////////X 1000 S 170 //////////////////////////////////
   
@@ -211,9 +212,14 @@ void a_selectionEfficiency(){
   fraction2error[5] = sqrt(fraction2[5] * (1-fraction2[5])) / sqrt(nentries1);
   fraction3error[5] = sqrt(fraction3[5] * (1-fraction3[5])) / sqrt(nentries1);
   
+  totalEfficiency[5] = fraction1[5] + fraction2[5] + fraction3[5];
+  totalEfficiencyError[5] = sqrt(totalEfficiency[5] * (1-totalEfficiency[5])) / sqrt(nentries1);
+  
   cout << fraction1[5] << endl;
   cout << fraction2[5] << endl;
   cout << fraction3[5] << endl;
+  
+  cout << "total efficiency: " << totalEfficiency[5] << " +/- " << totalEfficiencyError[5] << endl;
   
   file1->Close();
 
@@ -311,9 +317,14 @@ void a_selectionEfficiency(){
   fraction2error[0] = sqrt(fraction2[0] * (1-fraction2[0])) / sqrt(nentries2);
   fraction3error[0] = sqrt(fraction3[0] * (1-fraction3[0])) / sqrt(nentries2);
   
+  totalEfficiency[0] = fraction1[0] + fraction2[0] + fraction3[0];
+  totalEfficiencyError[0] = sqrt(totalEfficiency[0] * (1-totalEfficiency[0])) / sqrt(nentries2);
+  
   cout << fraction1[0] << endl;
   cout << fraction2[0] << endl;
   cout << fraction3[0] << endl;
+  
+  cout << "total efficiency: " << totalEfficiency[0] << " +/- " << totalEfficiencyError[0] << endl;
   
   file2->Close();
 /////////////////////////////////////////////////
@@ -411,9 +422,15 @@ void a_selectionEfficiency(){
   fraction2error[1] = sqrt(fraction2[1] * (1-fraction2[1])) / sqrt(nentries3);
   fraction3error[1] = sqrt(fraction3[1] * (1-fraction3[1])) / sqrt(nentries3);
   
+  totalEfficiency[1] = fraction1[1] + fraction2[1] + fraction3[1];
+  totalEfficiencyError[1] = sqrt(totalEfficiency[1] * (1-totalEfficiency[1])) / sqrt(nentries3);
+  
   cout << fraction1[1] << endl;
   cout << fraction2[1] << endl;
   cout << fraction3[1] << endl;
+  
+  cout << "total efficiency: " << totalEfficiency[1] << " +/- " << totalEfficiencyError[1] << endl;
+  
   file3->Close();
   
 ///////////////////////////////X 2000 S 400//////////////////////////////////////////////////
@@ -511,9 +528,14 @@ void a_selectionEfficiency(){
   fraction2error[2] = sqrt(fraction2[2] * (1-fraction2[2])) / sqrt(nentries4);
   fraction3error[2] = sqrt(fraction3[2] * (1-fraction3[2])) / sqrt(nentries4);
   
+  totalEfficiency[2] = fraction1[2] + fraction2[2] + fraction3[2];
+  totalEfficiencyError[2] = sqrt(totalEfficiency[2] * (1-totalEfficiency[2])) / sqrt(nentries4);
+  
   cout << fraction1[2] << endl;
   cout << fraction2[2] << endl;
   cout << fraction3[2] << endl;
+  
+  cout << "total efficiency: " << totalEfficiency[2] << " +/- " << totalEfficiencyError[2] << endl;
   
   file4->Close();
   
@@ -612,9 +634,14 @@ void a_selectionEfficiency(){
   fraction2error[3] = sqrt(fraction2[3] * (1-fraction2[3])) / sqrt(nentries5);
   fraction3error[3] = sqrt(fraction3[3] * (1-fraction3[3])) / sqrt(nentries5);
   
+  totalEfficiency[3] = fraction1[3] + fraction2[3] + fraction3[3];
+  totalEfficiencyError[3] = sqrt(totalEfficiency[3] * (1-totalEfficiency[3])) / sqrt(nentries5);
+  
   cout << fraction1[3] << endl;
   cout << fraction2[3] << endl;
   cout << fraction3[3] << endl;
+  
+  cout << "total efficiency: " << totalEfficiency[3] << " +/- " << totalEfficiencyError[3] << endl;
   
   file5->Close();
   
@@ -715,9 +742,14 @@ void a_selectionEfficiency(){
   fraction2error[4] = sqrt(fraction2[4] * (1-fraction2[4])) / sqrt(nentries6);
   fraction3error[4] = sqrt(fraction3[4] * (1-fraction3[4])) / sqrt(nentries6);
   
+  totalEfficiency[4] = fraction1[4] + fraction2[4] + fraction3[4];
+  totalEfficiencyError[4] = sqrt(totalEfficiency[4] * (1-totalEfficiency[4])) / sqrt(nentries6);
+  
   cout << fraction1[4] << endl;
   cout << fraction2[4] << endl;
   cout << fraction3[4] << endl;
+  
+  cout << "total efficiency: " << totalEfficiency[4] << " +/- " << totalEfficiencyError[4] << endl;
   
   file6->Close();
  
@@ -726,41 +758,51 @@ void a_selectionEfficiency(){
   TFile f("a_selectionEfficiency.root", "recreate");
 
   ca = new TCanvas("ca", "Event Selection Efficiency for different S mass points", 1200, 900);
-  ca -> SetFillColor(kYellow-10);
+  ca -> SetFillColor(kWhite);
   float ex[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   
   gr1 = new TGraphErrors(6, smass, fraction1, ex, fraction1error);
   gr2 = new TGraphErrors(6, smass, fraction2, ex, fraction2error);
   gr3 = new TGraphErrors(6, smass, fraction3, ex, fraction3error);
+  gr4 = new TGraphErrors(6, smass, totalEfficiency, ex, totalEfficiencyError);
   
-  gr1->SetFillColor(kYellow-10);
-  gr1->SetLineColor(1);
+  gr1->SetFillColor(kWhite);
+  gr1->SetLineColor(3);
   gr1->SetLineWidth(3);
   gr1->SetMarkerStyle(2);
-  gr1->SetMarkerColor(1);
+  gr1->SetMarkerColor(3);
   gr1->SetTitle("Event Selection Efficiency at different S mass points for M_{X} = 2 TeV (without b-tagging)");
   gr1->GetXaxis()->SetTitle("M_{S}    [GeV]");
-  gr1->GetYaxis()->SetRangeUser(0.0, 0.5); 
+  gr1->GetYaxis()->SetRangeUser(0.0, 0.6); 
   gr1->GetYaxis()->SetTitle("Fraction of Events");
   
-  gr2->SetFillColor(kYellow-10);
+  gr2->SetFillColor(kWhite);
   gr2->SetLineColor(2);
   gr2->SetLineWidth(3);
   gr2->SetMarkerStyle(2);
   gr2->SetMarkerColor(2);
   
-  gr3->SetFillColor(kYellow-10);
+  gr3->SetFillColor(kWhite);
   gr3->SetLineColor(4);
   gr3->SetLineWidth(3);
   gr3->SetMarkerStyle(2);
   gr3->SetMarkerColor(4);
   
+  gr4->SetFillColor(kWhite);
+  gr4->SetLineColor(1);
+  gr4->SetLineWidth(3);
+  gr4->SetLineStyle(10);
+  gr4->SetMarkerStyle(1);
+  gr4->SetMarkerColor(1);
+  
   gr1->Draw();
   gr2->Draw("same");
   gr3->Draw("same");
+  gr4->Draw("same");
   
   auto legend = new TLegend(0.6,0.6,0.9,0.8);	// (x1, y1, x2, y2)
-  legend->SetFillColor(kYellow-10);
+  legend->SetFillColor(kWhite);
+  legend->AddEntry(gr4, "Total Efficiency");
   legend->AddEntry(gr1,"Fully Boosted: 1 H + WW jet");
   legend->AddEntry(gr2,"Boosted: 1 H + 2 W");
   legend->AddEntry(gr3, "Semi-Boosted: 1 H + 1 W + 1 W_{j j}");
